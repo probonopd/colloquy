@@ -61,6 +61,12 @@
 #ifndef OSType
 #define OSType uint32_t
 #endif
+
+// See the same override in CQCompatibility.h.
+#undef TARGET_OS_IPHONE
+#define TARGET_OS_IPHONE 0
+#undef TARGET_OS_OSX
+#define TARGET_OS_OSX 1
 typedef uint32_t UInt32;
 typedef uint16_t UInt16;
 

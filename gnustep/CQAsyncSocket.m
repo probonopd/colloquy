@@ -7,6 +7,9 @@
  */
 
 #import <Foundation/Foundation.h>
+#import <sys/types.h>
+#import <sys/socket.h>
+#import <netinet/in.h>
 #import <netdb.h>
 #import <arpa/inet.h>
 #import <GNUstepBase/GSTLS.h>

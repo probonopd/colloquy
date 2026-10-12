@@ -11,8 +11,6 @@
  *   - dispatch_* functions  -> CQSerialQueue
  *   - GCDAsyncSocket        -> CQAsyncSocket
  *   - Security (SecTrust)   -> always-trust stubs
- *   - SystemConfiguration   -> always-reachable stubs
- *   - CoreFoundation        -> GNUstep object shims
  *
  * Include this header from every Chat Core source file (via the build's
  * ADDITIONAL_CPPFLAGS -include option) instead of @import CocoaAsyncSocket.
@@ -52,13 +50,16 @@
 #define OSType uint32_t
 #endif
 
-// ---- Target conditionals (Apple-only; default everything off) -------------
-#ifndef TARGET_OS_IPHONE
+// ---- Target conditionals --------------------------------------------------
+// The shared sources pick between their AppKit and their UIKit code with
+// these, and this is the AppKit build.  A platform that ships CoreFoundation
+// has already defined both of them from its own notion of the target (OSX
+// follows DARWIN, so it comes out 0 on a BSD), which would select the UIKit
+// branches, so override rather than default them.
+#undef TARGET_OS_IPHONE
 #define TARGET_OS_IPHONE 0
-#endif
-#ifndef TARGET_OS_OSX
+#undef TARGET_OS_OSX
 #define TARGET_OS_OSX 1
-#endif
 
 // ---------------------------------------------------------------------------
 // libdispatch (GCD) shim -> CQSerialQueue

@@ -20,6 +20,17 @@ Colloquy_SUBPROJECTS = ChatCoreLib
 # plugins/scripting.  Assertions are compiled out as in every configuration of
 # the Xcode project (Settings/Base.xcconfig); the sources rely on that, e.g.
 # JVStyle's -dealloc passes nil to a method that asserts a non-nil argument.
+# libxml2 and libxslt live under /usr on Linux and under /usr/local on the
+# BSDs, so ask their own config scripts where they are instead of hardcoding.
+XML2_CONFIG := $(shell command -v xml2-config)
+ifeq ($(XML2_CONFIG),)
+$(error xml2-config not found; install the libxml2 development files)
+endif
+XSLT_CONFIG := $(shell command -v xslt-config)
+ifeq ($(XSLT_CONFIG),)
+$(error xslt-config not found; install the libxslt development files)
+endif
+
 PORTS = -DGNUSTEP=1 \
         -DENABLE_IRC=1 -DENABLE_ICB=0 -DENABLE_SILC=0 -DENABLE_XMPP=0 \
         -DENABLE_PLUGINS=0 -DENABLE_SCRIPTING=0 -DENABLE_AUTO_PORT_MAPPING=0 \
@@ -43,7 +54,8 @@ ADDITIONAL_CPPFLAGS += $(PORTS) \
 	-I$(CURDIR)/Mac-Old/Mac-Old/Plug-Ins/SDK \
 	-I$(CURDIR)/Shared/Controllers \
 	-I$(CURDIR)/Shared/Models \
-	-I/usr/include/libxml2 \
+	$(shell $(XML2_CONFIG) --cflags) \
+	$(shell $(XSLT_CONFIG) --cflags) \
 	-include GSCompatibility.h
 
 # GNUstep's AppKit declares the NSOutlineView data source and delegate, the
@@ -187,7 +199,8 @@ Colloquy_OBJC_FILES = \
 
 # The app links against the Chat Core library (IRC-only), libxml2 for the
 # transcript model and styles, and the standard GNUstep GUI libraries.
-Colloquy_OBJC_LIBS = -lchatcore -lxml2 -lxslt -lexslt \
+Colloquy_OBJC_LIBS = -lchatcore $(shell $(XSLT_CONFIG) --libs) -lexslt \
+	$(shell $(XML2_CONFIG) --libs) \
 	$(FND_LIBS) $(OBJC_LIBS) -lgnustep-gui
 
 # Keep everything in the SYSTEM domain; never install to LOCAL.
