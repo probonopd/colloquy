@@ -90,7 +90,6 @@ Colloquy_OBJC_FILES = \
 	gnustep-app/GSCompatibility.m \
 	gnustep-app/JVStyleView.m \
 	gnustep-app/WebKit/WebView.m \
-	gnustep-app/SearchKit/SearchKit.m \
 	gnustep-app/MASPreferences/MASPreferences.m \
 	Mac-Old/Mac-Old/main.m \
 	Mac-Old/Mac-Old/Controllers/CQActivityWindowController.m \

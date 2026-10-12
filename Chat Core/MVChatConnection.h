@@ -1,11 +1,13 @@
 #import <Foundation/Foundation.h>
 #ifdef GNUSTEP
 #import "CQCompatibility.h"
-#else
-#import <SystemConfiguration/SCNetworkReachability.h>
 #endif
 
 #import "MVAvailability.h"
+
+#if ENABLE(REACHABILITY)
+#import <SystemConfiguration/SCNetworkReachability.h>
+#endif
 #import "MVChatString.h"
 
 
@@ -180,7 +182,9 @@ COLLOQUY_EXPORT
 	NSError *_lastError; // socket errors
 	NSError *_serverError; // messages from the server
 
+#if ENABLE(REACHABILITY)
 	SCNetworkReachabilityRef _reachability;
+#endif
 
 	NSDate *_connectedDate;
 

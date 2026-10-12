@@ -74,11 +74,11 @@ enum {
 	kSecAuthenticationTypeHTTPDigest = 0x000F
 };
 
-extern OSStatus SecKeychainFindGenericPassword(CFTypeRef keychainOrArray,
+extern OSStatus SecKeychainFindGenericPassword(const void *keychainOrArray,
 	unsigned int serviceNameLength, const char *serviceName,
 	unsigned int accountNameLength, const char *accountName,
 	unsigned int *passwordLength, void **passwordData, SecKeychainItemRef *itemRef);
-extern OSStatus SecKeychainFindInternetPassword(CFTypeRef keychainOrArray,
+extern OSStatus SecKeychainFindInternetPassword(const void *keychainOrArray,
 	unsigned int serverNameLength, const char *serverName,
 	unsigned int securityDomainLength, const char *securityDomain,
 	unsigned int accountNameLength, const char *accountName,
@@ -87,12 +87,12 @@ extern OSStatus SecKeychainFindInternetPassword(CFTypeRef keychainOrArray,
 	unsigned int *passwordLength, void **passwordData, SecKeychainItemRef *itemRef);
 extern OSStatus SecKeychainItemFreeContent(void *attrList, void *data);
 extern OSStatus SecKeychainItemDelete(SecKeychainItemRef itemRef);
-extern OSStatus SecKeychainAddGenericPassword(CFTypeRef keychain,
+extern OSStatus SecKeychainAddGenericPassword(const void *keychain,
 	unsigned int serviceNameLength, const char *serviceName,
 	unsigned int accountNameLength, const char *accountName,
 	unsigned int passwordLength, const void *passwordData,
 	SecKeychainItemRef *itemRef);
-extern OSStatus SecKeychainAddInternetPassword(CFTypeRef keychain,
+extern OSStatus SecKeychainAddInternetPassword(const void *keychain,
 	unsigned int serverNameLength, const char *serverName,
 	unsigned int securityDomainLength, const char *securityDomain,
 	unsigned int accountNameLength, const char *accountName,

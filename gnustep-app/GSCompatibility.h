@@ -61,7 +61,6 @@
 #ifndef OSType
 #define OSType uint32_t
 #endif
-typedef void * CFTypeRef;
 typedef uint32_t UInt32;
 typedef uint16_t UInt16;
 
@@ -159,11 +158,6 @@ io_iterator_t IOServiceMatching(const char *name);
 kern_return_t IOServiceGetMatchingServices(mach_port_t masterPort, io_iterator_t matching, io_iterator_t *existing);
 io_object_t IOIteratorNext(io_iterator_t iterator);
 void IOObjectRelease(io_object_t object);
-
-// IORegistryEntryCreateCFProperties + the CoreFoundation bits idleTime needs.
-typedef struct __CFDictionary * CFMutableDictionaryRef;
-extern void * const kCFAllocatorDefault;
-void IORegistryEntryCreateCFProperties(io_object_t entry, CFMutableDictionaryRef *properties, void *allocator, unsigned int options);
 
 // AppleEvent constants used for URL events and open-document searches.
 typedef uint32_t FourCharCode;
@@ -384,7 +378,6 @@ enum {
 #import <Sparkle/SUUpdater.h>
 #import <Growl/GrowlApplicationBridge.h>
 #import <MASPreferences/MASPreferences.h>
-#import <SearchKit/SearchKit.h>
 
 // ---- Cocoa scripting (AppleScript) -----------------------------------------
 // GNUstep ships NSScriptCommand, NSScriptClassDescription, NSAppleEventManager

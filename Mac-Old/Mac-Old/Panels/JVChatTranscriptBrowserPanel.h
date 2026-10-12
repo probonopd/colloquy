@@ -18,8 +18,10 @@
 
 	BOOL _shouldIndex;
 
+#ifndef GNUSTEP
 	SKIndexRef _logsIndex;
 	SKSearchGroupRef _searchGroup;
+#endif
 }
 + (JVChatTranscriptBrowserPanel *) sharedBrowser;
 

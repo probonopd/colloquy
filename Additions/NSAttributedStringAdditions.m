@@ -2,8 +2,6 @@
 #import "NSColorAdditions.h"
 #import "NSStringAdditions.h"
 #import "NSScannerAdditions.h"
-#import <CoreFoundation/CFString.h>
-#import <CoreFoundation/CFStringEncodingExt.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -265,39 +263,7 @@ NSString *NSChatCTCPTwoFormatType = @"NSChatCTCPTwoFormatType";
 				} else if( [encodingStr isEqualToString:@"U"] ) {
 					newEncoding = NSUTF8StringEncoding;
 				} else {
-					NSUInteger enc = [encodingStr intValue];
-					switch( enc ) {
-						case 1:
-							newEncoding = NSISOLatin1StringEncoding;
-							break;
-						case 2:
-							newEncoding = NSISOLatin2StringEncoding;
-							break;
-						case 3:
-							newEncoding = CFStringConvertEncodingToNSStringEncoding( kCFStringEncodingISOLatin3 );
-							break;
-						case 4:
-							newEncoding = CFStringConvertEncodingToNSStringEncoding( kCFStringEncodingISOLatin4 );
-							break;
-						case 5:
-							newEncoding = CFStringConvertEncodingToNSStringEncoding( kCFStringEncodingISOLatinCyrillic );
-							break;
-						case 6:
-							newEncoding = CFStringConvertEncodingToNSStringEncoding( kCFStringEncodingISOLatinArabic );
-							break;
-						case 7:
-							newEncoding = CFStringConvertEncodingToNSStringEncoding( kCFStringEncodingISOLatinGreek );
-							break;
-						case 8:
-							newEncoding = CFStringConvertEncodingToNSStringEncoding( kCFStringEncodingISOLatinHebrew );
-							break;
-						case 9:
-							newEncoding = CFStringConvertEncodingToNSStringEncoding( kCFStringEncodingISOLatin5 );
-							break;
-						case 10:
-							newEncoding = CFStringConvertEncodingToNSStringEncoding( kCFStringEncodingISOLatin6 );
-							break;
-					}
+					newEncoding = MVEncodingForISO8859Part( [encodingStr intValue] );
 				}
 
 				if( newEncoding && newEncoding != currentEncoding ) {

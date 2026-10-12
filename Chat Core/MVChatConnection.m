@@ -194,8 +194,9 @@ static const NSStringEncoding supportedEncodings[] = {
 
 		_joinedRooms = [[NSMutableSet alloc] initWithCapacity:10];
 
-		CFDictionaryValueCallBacks valueCallbacks = { 0, NULL, NULL, kCFTypeDictionaryValueCallBacks.copyDescription, kCFTypeDictionaryValueCallBacks.equal };
-		_knownRooms = (NSMutableDictionary *)CFBridgingRelease(CFDictionaryCreateMutable(NULL, 0, &kCFTypeDictionaryKeyCallBacks, &valueCallbacks));
+		// A room refers to its connection weakly, so an ordinary dictionary
+		// keeps no cycle; -_connectionDestroyed empties it at teardown.
+		_knownRooms = [[NSMutableDictionary alloc] init];
 
 		_knownUsers = [[NSMapTable alloc] initWithKeyOptions:NSMapTableObjectPointerPersonality|NSMapTableCopyIn
 												valueOptions:NSMapTableObjectPointerPersonality|NSMapTableWeakMemory
@@ -295,10 +296,12 @@ static const NSStringEncoding supportedEncodings[] = {
 	[[[NSWorkspace sharedWorkspace] notificationCenter] removeObserver:self];
 #endif
 
+#if ENABLE(REACHABILITY)
 	if (_reachability) {
 		SCNetworkReachabilityUnscheduleFromRunLoop(_reachability, CFRunLoopGetMain(), kCFRunLoopDefaultMode);
 		CFRelease(_reachability);
 	}
+#endif
 
 	for (MVChatUser *user in NSAllMapTableValues(_knownUsers)) {
 		[user _connectionDestroyed];
@@ -500,6 +503,7 @@ static const NSStringEncoding supportedEncodings[] = {
 
 #pragma mark -
 
+#if ENABLE(REACHABILITY)
 static void reachabilityCallback( SCNetworkReachabilityRef target, SCNetworkConnectionFlags flags, void *context ) {
 	MVChatConnection *connection = (__bridge MVChatConnection *)context;
 
@@ -518,10 +522,12 @@ static void reachabilityCallback( SCNetworkReachabilityRef target, SCNetworkConn
 
 	[connection performSelector:@selector(connect) withObject:nil afterDelay:3.];
 }
+#endif
 
 - (void) setServer:(NSString *) server {
 // subclass this method, call super
 
+#if ENABLE(REACHABILITY)
 	if( _reachability ) {
 		SCNetworkReachabilityUnscheduleFromRunLoop( _reachability, CFRunLoopGetMain(), kCFRunLoopDefaultMode );
 		CFRelease( _reachability );
@@ -540,6 +546,9 @@ static void reachabilityCallback( SCNetworkReachabilityRef target, SCNetworkConn
 		return;
 
 	SCNetworkReachabilityScheduleWithRunLoop( _reachability, CFRunLoopGetMain(), kCFRunLoopDefaultMode );
+#else
+	(void)server;
+#endif
 }
 
 - (NSString *) server {

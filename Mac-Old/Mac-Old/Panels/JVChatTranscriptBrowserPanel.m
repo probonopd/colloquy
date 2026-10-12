@@ -79,6 +79,10 @@ NSString *criteria[4] = { @"server", @"target", @"session", nil };
 			_dirtyLogs = [[NSKeyedUnarchiver unarchiveObjectWithFile:[self dirtyPath]] retain];
 		else _dirtyLogs = [[NSMutableSet alloc] init];
 
+#ifdef GNUSTEP
+		// Without SearchKit there is no index to build or keep up to date.
+		_shouldIndex = NO;
+#else
 		if( [[NSFileManager defaultManager] fileExistsAtPath:[self indexPath]] ) {
 			_shouldIndex = NO;
 			_logsIndex = SKIndexOpenWithURL( (CFURLRef) [NSURL fileURLWithPath:[self indexPath]], NULL, YES );
@@ -90,6 +94,7 @@ NSString *criteria[4] = { @"server", @"target", @"session", nil };
 		CFArrayRef indexes = CFArrayCreate( kCFAllocatorDefault, (void *) &_logsIndex, 1, &kCFTypeArrayCallBacks );
 		_searchGroup = SKSearchGroupCreate( indexes );
 		CFRelease( indexes );
+#endif
 
 		NSDirectoryEnumerator *logsEnum = [[NSFileManager defaultManager] enumeratorAtPath:[self logsPath]];
 		NSString *logPath = nil;
@@ -162,8 +167,10 @@ NSString *criteria[4] = { @"server", @"target", @"session", nil };
 	_shouldIndex = NO;
 	[NSKeyedArchiver archiveRootObject:_dirtyLogs toFile:[self dirtyPath]];
 
+#ifndef GNUSTEP
 	CFRelease( _logsIndex ); // was SKIndexClose, functionally equivalent
 	CFRelease( _searchGroup );
+#endif
 
 	[tableView setDataSource:nil];
 	[tableView setDelegate:nil];
@@ -226,7 +233,7 @@ NSString *criteria[4] = { @"server", @"target", @"session", nil };
 	if( [[searchField stringValue] length] ) {
 		if( criteria[_selectedTag] ) {
 			NSMutableArray *filtered = [NSMutableArray arrayWithCapacity:[_transcripts count]];
-			for( NSDictionary *d in _transcripts ) {
+			for( NSDictionary *d in [_transcripts allValues] ) {
 				if( [[d objectForKey:criteria[_selectedTag]] rangeOfString:[searchField stringValue]].location != NSNotFound ) {
 					[filtered addObject:d];
 				}
@@ -234,6 +241,24 @@ NSString *criteria[4] = { @"server", @"target", @"session", nil };
 
 			[_filteredTranscripts release];
 			_filteredTranscripts = [filtered retain];
+#ifdef GNUSTEP
+		} else {
+			// SearchKit ranks matches in the transcript text itself.  Without
+			// it, searching every criterion is the closest the port can get
+			// without reading every transcript on each keystroke.
+			NSMutableArray *filtered = [NSMutableArray arrayWithCapacity:[_transcripts count]];
+			for( NSDictionary *d in [_transcripts allValues] ) {
+				for( NSUInteger c = 0; criteria[c]; c++ ) {
+					if( [[d objectForKey:criteria[c]] rangeOfString:[searchField stringValue]].location != NSNotFound ) {
+						[filtered addObject:d];
+						break;
+					}
+				}
+			}
+
+			[_filteredTranscripts release];
+			_filteredTranscripts = [filtered retain];
+#else
 		} else {
 			NSMutableArray *tempArray = [[NSMutableArray alloc] init];
 
@@ -263,6 +288,7 @@ NSString *criteria[4] = { @"server", @"target", @"session", nil };
 
 			[_filteredTranscripts release];
 			_filteredTranscripts = tempArray;
+#endif
 		}
 	} else {
 		[_filteredTranscripts release];
@@ -319,12 +345,14 @@ NSString *criteria[4] = { @"server", @"target", @"session", nil };
 
 		if( ! path ) break;
 
+#ifndef GNUSTEP
 		SKDocumentRef document = SKDocumentCreateWithURL( (CFURLRef) [NSURL fileURLWithPath:path] );
 		NSString *toIndex = [[NSString alloc] initWithContentsOfFile:path]; // FIXME strip xml (w/o NSXMLDocument...) ?
 		SKIndexAddDocumentWithText( _logsIndex, document, (CFStringRef) toIndex, YES );
 		CFRelease( document );
 
 		[toIndex release];
+#endif
 		[path release];
 
 		[self performSelectorOnMainThread:@selector( updateStatus ) withObject:nil waitUntilDone:NO];
@@ -332,7 +360,9 @@ NSString *criteria[4] = { @"server", @"target", @"session", nil };
 
 	[self performSelectorOnMainThread:@selector( syncDirtyLogsList ) withObject:nil waitUntilDone:NO];
 
+#ifndef GNUSTEP
 	SKIndexFlush( _logsIndex );
+#endif
 
 	[pool release];
 }

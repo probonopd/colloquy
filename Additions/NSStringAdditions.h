@@ -2,6 +2,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 COLLOQUY_EXPORT BOOL isValidUTF8( const char *string, NSUInteger length );
 
+// The mIRC colour/encoding escape names an ISO 8859 part by number.
+COLLOQUY_EXPORT NSStringEncoding MVEncodingForISO8859Part( NSUInteger part );
+
 #define is7Bit(ch) (((ch) & 0x80) == 0)
 #define isUTF8Tupel(ch) (((ch) & 0xE0) == 0xC0)
 #define isUTF8LongTupel(ch) (((ch) & 0xFE) == 0xC0)

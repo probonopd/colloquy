@@ -40,13 +40,6 @@ io_object_t IOIteratorNext(io_iterator_t iterator) { (void)iterator; return 0; }
 
 void IOObjectRelease(io_object_t object) { (void)object; }
 
-void * const kCFAllocatorDefault = NULL;
-
-void IORegistryEntryCreateCFProperties(io_object_t entry, CFMutableDictionaryRef *properties, void *allocator, unsigned int options) {
-	(void)entry; (void)allocator; (void)options;
-	if (properties) *properties = NULL;
-}
-
 FourCharCode keyAESearchText = 'TEXT';
 FourCharCode kInternetEventClass = 'GURL';
 FourCharCode kAEGetURL = 'GURL';
@@ -476,7 +469,7 @@ NSString * const NSScrollViewDidEndLiveScrollNotification = @"NSScrollViewDidEnd
 
 // ---- Security keychain stubs ------------------------------------------------
 
-OSStatus SecKeychainFindGenericPassword(CFTypeRef keychainOrArray,
+OSStatus SecKeychainFindGenericPassword(const void *keychainOrArray,
 	unsigned int serviceNameLength, const char *serviceName,
 	unsigned int accountNameLength, const char *accountName,
 	unsigned int *passwordLength, void **passwordData, SecKeychainItemRef *itemRef) {
@@ -486,7 +479,7 @@ OSStatus SecKeychainFindGenericPassword(CFTypeRef keychainOrArray,
 	return errSecItemNotFound;
 }
 
-OSStatus SecKeychainFindInternetPassword(CFTypeRef keychainOrArray,
+OSStatus SecKeychainFindInternetPassword(const void *keychainOrArray,
 	unsigned int serverNameLength, const char *serverName,
 	unsigned int securityDomainLength, const char *securityDomain,
 	unsigned int accountNameLength, const char *accountName,
@@ -510,7 +503,7 @@ OSStatus SecKeychainItemDelete(SecKeychainItemRef itemRef) {
 	return errSecSuccess;
 }
 
-OSStatus SecKeychainAddGenericPassword(CFTypeRef keychain,
+OSStatus SecKeychainAddGenericPassword(const void *keychain,
 	unsigned int serviceNameLength, const char *serviceName,
 	unsigned int accountNameLength, const char *accountName,
 	unsigned int passwordLength, const void *passwordData,
@@ -521,7 +514,7 @@ OSStatus SecKeychainAddGenericPassword(CFTypeRef keychain,
 	return errSecItemNotFound;
 }
 
-OSStatus SecKeychainAddInternetPassword(CFTypeRef keychain,
+OSStatus SecKeychainAddInternetPassword(const void *keychain,
 	unsigned int serverNameLength, const char *serverName,
 	unsigned int securityDomainLength, const char *securityDomain,
 	unsigned int accountNameLength, const char *accountName,

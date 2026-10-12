@@ -90,6 +90,11 @@ static BOOL applicationIsTerminating = NO;
 // idle stuff adapted from a post by Jonathan 'Wolf' Rentzsch on the cocoa-dev mailing list.
 
 - (NSTimeInterval) idleTime {
+#ifdef GNUSTEP
+	// The idle counter comes from the IOHIDSystem registry entry, which only
+	// exists on macOS, so the machine never reports itself as idle here.
+	return 0.;
+#else
 	NSMutableDictionary *hidProperties = nil;
 	CFMutableDictionaryRef hidPropertiesRef = (__bridge CFMutableDictionaryRef)hidProperties;
 	IORegistryEntryCreateCFProperties( _hidEntry, &hidPropertiesRef, kCFAllocatorDefault, 0 );
@@ -104,6 +109,7 @@ static BOOL applicationIsTerminating = NO;
 		CFRelease(hidPropertiesRef);
 
 	return ( result / 1000000000. );
+#endif
 }
 
 - (void) checkIdle:(id) sender {
