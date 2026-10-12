@@ -235,8 +235,8 @@ XIBS = $(wildcard Mac-Old/Mac-Old/Interfaces/*.xib) \
 # checksummed by the shell rather than passed through make.
 IMAGE_STAMP_CMD = find Mac-Old/Mac-Old/Resources/Mac-Old.xcassets \
 	"Mac-Old/Mac-Old/Resources/Misc Images" gnustep/Images \
-	\( -name '*.pdf' -o -name '*.png' -o -name '*.eps' \) | sort | \
-	while read f; do cksum "$$f"; done
+	\( -name '*.pdf' -o -name '*.png' -o -name '*.eps' \) | \
+	while read f; do cksum "$$f"; done | LC_ALL=C sort
 
 .PHONY: images
 images:
@@ -246,7 +246,7 @@ images:
 .PHONY: nibs
 nibs:
 	python3 $(CURDIR)/gnustep/xib2nib.py $(XIBS)
-	@cksum $(XIBS) > gnustep/nib-stamps
+	@cksum $(XIBS) | LC_ALL=C sort > gnustep/nib-stamps
 
 before-all::
 	@missing=$$(for x in $(XIBS); do \
@@ -260,7 +260,7 @@ before-all::
 	fi
 	# A checkout gives every file the same timestamp, so the nibs are compared
 	# with the checksums the conversion recorded rather than with mtimes.
-	@cksum $(XIBS) > gnustep/nib-stamps.now; \
+	@cksum $(XIBS) | LC_ALL=C sort > gnustep/nib-stamps.now; \
 	if ! cmp -s gnustep/nib-stamps gnustep/nib-stamps.now; then \
 		echo "These xibs changed after their nib was generated; regenerate with"; \
 		echo "  make nibs"; \
