@@ -35,7 +35,7 @@ extern NSString *const MVIRCChatConnectionZNCPluginPlaybackFeature;
 
 + (NSData *) _flattenedIRCDataForMessage:(MVChatString *) message withEncoding:(NSStringEncoding) enc andChatFormat:(MVChatMessageFormat) format;
 - (void) _sendMessage:(MVChatString *) message withEncoding:(NSStringEncoding) msgEncoding toTarget:(id) target withTargetPrefix:(NSString *) targetPrefix withAttributes:(NSDictionary *) attributes localEcho:(BOOL) echo;
-- (void) _sendCommand:(NSString *) command withArguments:(nullable MVChatString *) arguments withEncoding:(NSStringEncoding) encoding toTarget:(id __nullable) target;
+- (void) _sendCommand:(NSString *) command withArguments:(nullable MVChatString *) arguments withEncoding:(NSStringEncoding) encoding toTarget:(id _Nullable) target;
 
 - (void) sendBrokenDownMessage:(NSMutableData *) msg withPrefix:(NSString *) prefix withEncoding:(NSStringEncoding) msgEncoding withMaximumBytes:(NSUInteger) bytesLeft;
 - (NSUInteger) bytesRemainingForMessage:(NSString *) nickname withUsername:(NSString *) username withAddress:(NSString *) address withPrefix:(NSString *) prefix withEncoding:(NSStringEncoding) msgEncoding;
@@ -62,9 +62,9 @@ extern NSString *const MVIRCChatConnectionZNCPluginPlaybackFeature;
 
 @property (readonly, copy) NSCharacterSet *_nicknamePrefixes;
 - (MVChatRoomMemberMode) _modeForNicknamePrefixCharacter:(unichar) character;
-- (MVChatRoomMemberMode) _stripModePrefixesFromNickname:(NSString *__nonnull *__nonnull) nickname;
+- (MVChatRoomMemberMode) _stripModePrefixesFromNickname:(NSString *_Nonnull *_Nonnull) nickname;
 
-- (NSString *__nullable) _newStringWithBytes:(const char *) bytes length:(NSUInteger) length NS_RETURNS_RETAINED;
+- (NSString *_Nullable) _newStringWithBytes:(const char *) bytes length:(NSUInteger) length NS_RETURNS_RETAINED;
 - (NSString *) _stringFromPossibleData:(id) input;
 
 - (void) _cancelScheduledSendEndCapabilityCommand;

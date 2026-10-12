@@ -4,13 +4,16 @@ NS_ASSUME_NONNULL_BEGIN
 
 @implementation NSDate (NSDateAdditions)
 + (NSMutableDictionary *) cq_cacheDictionary {
-	static NSMutableDictionary *cacheDictionary = nil;
-	if (cacheDictionary)
-		return cacheDictionary;
-
-	cacheDictionary = [NSMutableDictionary dictionary];
-
-	return cacheDictionary;
+	// Per-thread cache: NSDateFormatter is not thread-safe and the previous
+	// shared global dictionary was mutated concurrently from the main thread
+	// and the connection thread, corrupting it (invalid reads / crashes).
+	NSMutableDictionary *cache = [[NSThread currentThread] threadDictionary];
+	NSMutableDictionary *dateCache = cache[@"cq_dateFormatterCache"];
+	if (!dateCache) {
+		dateCache = [NSMutableDictionary dictionary];
+		cache[@"cq_dateFormatterCache"] = dateCache;
+	}
+	return dateCache;
 }
 
 + (NSString *) formattedStringWithDate:(NSDate *) date dateFormat:(NSString *) format {

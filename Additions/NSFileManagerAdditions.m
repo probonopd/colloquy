@@ -1,12 +1,29 @@
 #import "NSFileManagerAdditions.h"
 
+#ifdef __MACH__
 #include <mach-o/arch.h>
 #include <mach-o/loader.h> 
 #include <mach-o/fat.h>
+#endif
 
 NS_ASSUME_NONNULL_BEGIN
 
 @implementation NSFileManager (Additions)
+#ifndef __MACH__
+
+- (MVArchitectures) architecturesForBinaryAtPath:(NSString *) path {
+	MVArchitectures architectures = { NO, NO, NO, NO, NO, NO, 1 };
+	(void)path;
+	return architectures;
+}
+
+- (BOOL) canExecutePluginAtPath:(NSString *) pluginPath {
+	(void)pluginPath;
+	return NO;
+}
+
+#else
+
 static inline void markArchitectureAsActiveForCPUType(MVArchitectures *architectures, cpu_type_t cpuType, cpu_subtype_t cpuSubtype) {
 	switch (cpuType) {
 	case CPU_TYPE_POWERPC:
@@ -113,6 +130,8 @@ static inline void swapIntsInHeader(uint8_t *bytes, ssize_t length) {
 	return validArchitectures.unknown;
 #endif
 }
+
+#endif // __MACH__
 @end
 
 NSString *NSStringFromMVArchitectures(MVArchitectures architectures) {

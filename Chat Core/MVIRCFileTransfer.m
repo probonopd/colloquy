@@ -1,6 +1,5 @@
 #import "MVIRCFileTransfer.h"
 
-@import CocoaAsyncSocket;
 
 #import "InterThreadMessaging.h"
 #import "MVChatUser.h"

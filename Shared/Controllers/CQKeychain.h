@@ -1,20 +1,19 @@
 #import <Foundation/Foundation.h>
 
-NS_ASSUME_NONNULL_BEGIN
+// GNUstep has no keychain; CQKeychain is stubbed to no-op (see CQKeychain.m).
+// The __nullable annotations from the upstream header are dropped because
+// older compilers do not accept them without the nullability feature.
 
-COLLOQUY_EXPORT
 @interface CQKeychain : NSObject
 + (CQKeychain *) standardKeychain;
 
-- (void) setPassword:(NSString *) password forServer:(NSString *) server area:(NSString *__nullable) area;
-- (void) setPassword:(NSString *) password forServer:(NSString *) server area:(NSString *__nullable) area displayValue:(NSString *__nullable)displayValue;
-- (NSString *__nullable) passwordForServer:(NSString *) server area:(NSString *__nullable) area;
-- (void) removePasswordForServer:(NSString *) server area:(NSString *__nullable) area;
+- (void) setPassword:(NSString *) password forServer:(NSString *) server area:(NSString *) area;
+- (void) setPassword:(NSString *) password forServer:(NSString *) server area:(NSString *) area displayValue:(NSString *)displayValue;
+- (NSString *) passwordForServer:(NSString *) server area:(NSString *) area;
+- (void) removePasswordForServer:(NSString *) server area:(NSString *) area;
 
-- (void) setData:(NSData *) passwordData forServer:(NSString *) server area:(NSString *__nullable) area;
-- (void) setData:(NSData *) passwordData forServer:(NSString *) server area:(NSString *__nullable) area displayValue:(NSString *__nullable)displayValue;
-- (NSData *__nullable) dataForServer:(NSString *) server area:(NSString *__nullable) area;
-- (void) removeDataForServer:(NSString *) server area:(NSString *__nullable) area;
+- (void) setData:(NSData *) passwordData forServer:(NSString *) server area:(NSString *) area;
+- (void) setData:(NSData *) passwordData forServer:(NSString *) server area:(NSString *) area displayValue:(NSString *)displayValue;
+- (NSData *) dataForServer:(NSString *) server area:(NSString *) area;
+- (void) removeDataForServer:(NSString *) server area:(NSString *) area;
 @end
-
-NS_ASSUME_NONNULL_END

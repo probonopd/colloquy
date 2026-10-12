@@ -75,8 +75,13 @@
 	(var)
 #endif
 
+#ifdef GNUSTEP
+#define MVAssertMainThreadRequired() \
+	NSAssert( [NSThread isMainThread], @"Method needs to run on the main thread, not %@.", [NSThread currentThread] )
+#else
 #define MVAssertMainThreadRequired() \
 	NSAssert1( pthread_main_np(), @"Method needs to run on the main thread, not %@.", [NSThread currentThread] )
+#endif
 
 #define MVAssertCorrectThreadRequired(thread) \
 	NSAssert2( [NSThread currentThread] == (thread), @"Method needs to run on %@, not %@.", (thread), [NSThread currentThread] )

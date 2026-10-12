@@ -35,7 +35,7 @@
 + (NSImage *) imageFromPDF:(NSString *) pdfName {
 	static NSMutableDictionary *images = nil;
 	static dispatch_once_t onceToken;
-	dispatch_once(&onceToken, ^{
+	CQQueueOnce(&onceToken, ^{
 		images = [NSMutableDictionary dictionary];
 	});
 

@@ -1,4 +1,3 @@
-@import XMPPFramework;
 
 #import "MVXMPPChatConnection.h"
 #import "MVXMPPChatUser.h"
@@ -34,7 +33,7 @@ NS_ASSUME_NONNULL_BEGIN
 		_username = NSUserName();
 		_nickname = _username;
 		_session = [[XMPPStream alloc] init];
- 		[_session addDelegate:self delegateQueue:dispatch_get_main_queue()];
+ 		[_session addDelegate:self delegateQueue:CQQueueMain()];
 
 //		[_session addObserver:self selector:@selector( outgoingPacket: ) name:JSESSION_RAWDATA_OUT];
 //		[_session addObserver:self selector:@selector( incomingPacket: ) name:JSESSION_RAWDATA_IN];
@@ -93,30 +92,30 @@ NS_ASSUME_NONNULL_BEGIN
 	
 }
 
-- (void) disconnectWithReason:(MVChatString * __nullable) reason {
+- (void) disconnectWithReason:(MVChatString * _Nullable) reason {
 	[self _willDisconnect];
 	[_session disconnect];
 }
 
 #pragma mark -
 
-- (void) setRealName:(NSString *__nullable) name {
+- (void) setRealName:(NSString *_Nullable) name {
 	// not supported
 }
 
-- (NSString *__nullable) realName {
+- (NSString *_Nullable) realName {
 	return nil;
 }
 
 #pragma mark -
 
-- (void) setNickname:(NSString *__nullable) newNickname {
+- (void) setNickname:(NSString *_Nullable) newNickname {
 	NSParameterAssert( newNickname != nil );
 	NSParameterAssert( newNickname.length > 0 );
 	MVSafeCopyAssign( _nickname, newNickname );
 }
 
-- (NSString *__nullable) nickname {
+- (NSString *_Nullable) nickname {
 	return _nickname;
 }
 
@@ -126,33 +125,33 @@ NS_ASSUME_NONNULL_BEGIN
 
 #pragma mark -
 
-- (void) setNicknamePassword:(NSString * __nullable) newPassword {
+- (void) setNicknamePassword:(NSString * _Nullable) newPassword {
 	// not supported
 }
 
-- (NSString *__nullable) nicknamePassword {
+- (NSString *_Nullable) nicknamePassword {
 	return nil;
 }
 
 #pragma mark -
 
-- (void) setPassword:(NSString *__nullable) newPassword {
+- (void) setPassword:(NSString *_Nullable) newPassword {
 	MVSafeCopyAssign( _password, newPassword );
 }
 
-- (NSString *__nullable) password {
+- (NSString *_Nullable) password {
 	return _password;
 }
 
 #pragma mark -
 
-- (void) setUsername:(NSString *__nullable) newUsername {
+- (void) setUsername:(NSString *_Nullable) newUsername {
 	NSParameterAssert( newUsername != nil );
 	NSParameterAssert( newUsername.length > 0 );
 	MVSafeCopyAssign( _username, newUsername );
 }
 
-- (NSString *__nullable) username {
+- (NSString *_Nullable) username {
 	return _username;
 }
 
@@ -209,7 +208,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 #pragma mark -
 
-- (void) joinChatRoomNamed:(NSString *) room withPassphrase:(NSString * __nullable) passphrase {
+- (void) joinChatRoomNamed:(NSString *) room withPassphrase:(NSString * _Nullable) passphrase {
 	NSParameterAssert( room != nil );
 	NSParameterAssert( room.length > 0 );
 
@@ -345,7 +344,7 @@ NS_ASSUME_NONNULL_BEGIN
 	if (!trust || !completionHandler)
 		return;
 
-	SecTrustEvaluateAsync(trust, dispatch_get_main_queue(), ^(SecTrustRef trustRef, SecTrustResultType result) {
+	SecTrustEvaluateAsync(trust, CQQueueMain(), ^(SecTrustRef trustRef, SecTrustResultType result) {
 		if (result == kSecTrustResultProceed || result == kSecTrustResultUnspecified) {
 			completionHandler(YES);
 			return;

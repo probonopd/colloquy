@@ -202,6 +202,15 @@ NSString *MVReadableTime( NSTimeInterval date, BOOL longFormat ) {
 
 #pragma mark -
 
+- (void) fileAtPathDidFinish:(NSString *) path {
+	if( ! [path length] ) return;
+
+	[[NSWorkspace sharedWorkspace] noteFileSystemChanged:path];
+
+	if( [[NSUserDefaults standardUserDefaults] boolForKey:@"JVOpenSafeFiles"] && [_safeFileExtentions containsObject:[[path pathExtension] lowercaseString]] )
+		[[NSWorkspace sharedWorkspace] openFile:path withApplication:nil andDeactivate:NO];
+}
+
 - (void) downloadFileAtURL:(NSURL *) url toLocalFile:(NSString *) path {
 	WebDownload *download = [[WebDownload alloc] initWithRequest:[NSURLRequest requestWithURL:url] delegate:self];
 
@@ -590,14 +599,8 @@ NSString *MVReadableTime( NSTimeInterval date, BOOL longFormat ) {
 
 	for( NSMutableDictionary *info in [_transferStorage copy] ) {
 		if( [[info objectForKey:@"controller"] isEqualTo:transfer] ) {
-			if( [transfer isDownload] ) {
-				NSString *path = [(MVDownloadFileTransfer *)transfer destination];
-
-				[[NSWorkspace sharedWorkspace] noteFileSystemChanged:path];
-
-				if( [[NSUserDefaults standardUserDefaults] boolForKey:@"JVOpenSafeFiles"] && [_safeFileExtentions containsObject:[[path pathExtension] lowercaseString]] )
-					[[NSWorkspace sharedWorkspace] openFile:path withApplication:nil andDeactivate:NO];
-			}
+			if( [transfer isDownload] )
+				[self fileAtPathDidFinish:[(MVDownloadFileTransfer *)transfer destination]];
 
 			if( [[NSUserDefaults standardUserDefaults] integerForKey:@"JVRemoveTransferredItems"] == 2 ) {
 				[_calculationItems removeObject:info];

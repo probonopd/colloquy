@@ -1,7 +1,7 @@
 #import <Foundation/Foundation.h>
 
-#import <ChatCore/MVAvailability.h>
-#import <ChatCore/MVChatString.h>
+#import "MVAvailability.h"
+#import "MVChatString.h"
 
 
 NS_ASSUME_NONNULL_BEGIN
@@ -126,7 +126,7 @@ COLLOQUY_EXPORT
 - (void) join;
 - (void) part;
 
-- (void) partWithReason:(MVChatString * __nullable) reason;
+- (void) partWithReason:(MVChatString * _Nullable) reason;
 
 - (void) changeTopic:(MVChatString *) topic;
 
@@ -151,16 +151,16 @@ COLLOQUY_EXPORT
 
 - (void) setModes:(NSUInteger) modes;
 - (void) setMode:(MVChatRoomMode) mode;
-- (void) setMode:(MVChatRoomMode) mode withAttribute:(id __nullable) attribute;
+- (void) setMode:(MVChatRoomMode) mode withAttribute:(id _Nullable) attribute;
 - (void) removeMode:(MVChatRoomMode) mode;
 
 - (NSSet *) memberUsersWithModes:(NSUInteger) modes;
 - (NSSet *) memberUsersWithNickname:(NSString *) nickname;
 - (NSSet *) memberUsersWithFingerprint:(NSString *) fingerprint;
-- (MVChatUser *__nullable) memberUserWithUniqueIdentifier:(id) identifier;
+- (MVChatUser *_Nullable) memberUserWithUniqueIdentifier:(id) identifier;
 - (BOOL) hasUser:(MVChatUser *) user;
 
-- (void) kickOutMemberUser:(MVChatUser *) user forReason:(MVChatString * __nullable) reason;
+- (void) kickOutMemberUser:(MVChatUser *) user forReason:(MVChatString * _Nullable) reason;
 
 - (void) addBanForUser:(MVChatUser *) user;
 - (void) removeBanForUser:(MVChatUser *) user;

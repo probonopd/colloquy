@@ -7,13 +7,13 @@ NS_ASSUME_NONNULL_BEGIN
 	static NSMutableDictionary *dangerousCache = nil;
 	static dispatch_once_t pred;
 	static dispatch_queue_t cacheQueue = NULL;
-	dispatch_once(&pred, ^{
+	CQQueueOnce(&pred, ^{
 		dangerousCache = [[NSMutableDictionary alloc] init];
-		cacheQueue = dispatch_queue_create("info.colloquy.regex.cache", DISPATCH_QUEUE_SERIAL);
+		cacheQueue = CQQueueCreate("info.colloquy.regex.cache", DISPATCH_QUEUE_SERIAL);
 	});
 
 	__block NSRegularExpression *regularExpression = NULL;
-	dispatch_sync(cacheQueue, ^{
+	CQQueueSync(cacheQueue, ^{
 		NSString *patternKey = dangerousCache[pattern];
 		if (!patternKey) {
 			@synchronized([NSRegularExpression class]) {

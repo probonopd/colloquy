@@ -3,14 +3,14 @@
 NS_ASSUME_NONNULL_BEGIN
 
 @interface NSScriptObjectSpecifier (NSScriptObjectSpecifierPrivate) // Private Foundation Methods
-+ (id) _objectSpecifierFromDescriptor:(NSAppleEventDescriptor *) descriptor inCommandConstructionContext:(id __nullable) context;
++ (id) _objectSpecifierFromDescriptor:(NSAppleEventDescriptor *) descriptor inCommandConstructionContext:(id _Nullable) context;
 - (NSAppleEventDescriptor *) _asDescriptor;
 @end
 
 #pragma mark -
 
 @implementation NSScriptCommand (NSScriptCommandAdditions)
-- (id __nullable) subjectParameter {
+- (id _Nullable) subjectParameter {
 	return [[self subjectSpecifier] objectsByEvaluatingSpecifier];
 }
 

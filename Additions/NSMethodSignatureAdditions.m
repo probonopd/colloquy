@@ -3,7 +3,7 @@
 NS_ASSUME_NONNULL_BEGIN
 
 @implementation NSMethodSignature (NSMethodSignatureAdditions)
-+ (id __nullable) methodSignatureWithReturnAndArgumentTypes:(const char *) retType, ... {
++ (id _Nullable) methodSignatureWithReturnAndArgumentTypes:(const char *) retType, ... {
 	NSMutableString *types = [NSMutableString stringWithFormat:@"%s@:", retType];
 
 	char *type = NULL;

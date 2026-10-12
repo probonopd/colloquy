@@ -1002,7 +1002,7 @@ static SilcClientOperations silcClientOps = {
 	else [NSThread detachNewThreadSelector:@selector( _silcRunloop ) toTarget:self withObject:nil];
 }
 
-- (void) disconnectWithReason:(MVChatString * __nullable) reason {
+- (void) disconnectWithReason:(MVChatString * _Nullable) reason {
 	[self cancelPendingReconnectAttempts];
 
 	if( [self status] != MVChatConnectionConnectedStatus ) return;
@@ -1031,21 +1031,21 @@ static SilcClientOperations silcClientOps = {
 
 #pragma mark -
 
-- (void) setRealName:(NSString *__nullable) name {
+- (void) setRealName:(NSString *_Nullable) name {
 	NSParameterAssert( name != nil );
 	if( ! [self _silcClient] ) return;
 	if( [self _silcClient] -> realname) free( [self _silcClient] -> realname );
 	[self _silcClient] -> realname = strdup( [name UTF8String] );
 }
 
-- (NSString *__nullable) realName {
+- (NSString *_Nullable) realName {
 	if( ! [self _silcClient] ) return nil;
 	return [NSString stringWithUTF8String:[self _silcClient] -> realname];
 }
 
 #pragma mark -
 
-- (void) setNickname:(NSString *__nullable) newNickname {
+- (void) setNickname:(NSString *_Nullable) newNickname {
 	NSParameterAssert( newNickname != nil );
 	NSParameterAssert( newNickname.length > 0 );
 	if( ! [self _silcClient] ) return;
@@ -1059,7 +1059,7 @@ static SilcClientOperations silcClientOps = {
 	}
 }
 
-- (NSString *__nullable) nickname {
+- (NSString *_Nullable) nickname {
 	if( [self isConnected] && [self _silcConn] && [self _silcConn] -> nickname )
 		return [NSString stringWithUTF8String:[self _silcConn] -> nickname];
 
@@ -1072,7 +1072,7 @@ static SilcClientOperations silcClientOps = {
 
 #pragma mark -
 
-- (NSString *__nullable) certificateServiceName {
+- (NSString *_Nullable) certificateServiceName {
 	return @"SILC Keypair";
 }
 
@@ -1088,24 +1088,24 @@ static SilcClientOperations silcClientOps = {
 	return YES;
 }
 
-- (NSString *__nullable) certificatePassword {
+- (NSString *_Nullable) certificatePassword {
 	return _certificatePassword;
 }
 
 #pragma mark -
 
-- (void) setPassword:(NSString *__nullable) newPassword {
+- (void) setPassword:(NSString *_Nullable) newPassword {
 	if( newPassword.length ) _silcPassword = [newPassword copy];
 	else _silcPassword = nil;
 }
 
-- (NSString *__nullable) password {
+- (NSString *_Nullable) password {
 	return _silcPassword;
 }
 
 #pragma mark -
 
-- (void) setUsername:(NSString *__nullable) newUsername {
+- (void) setUsername:(NSString *_Nullable) newUsername {
 	NSParameterAssert( newUsername != nil );
 	NSParameterAssert( newUsername.length > 0 );
 	if( ! [self _silcClient] ) return;
@@ -1114,7 +1114,7 @@ static SilcClientOperations silcClientOps = {
 	[self _silcClient] -> username = strdup( [newUsername UTF8String] );
 }
 
-- (NSString *__nullable) username {
+- (NSString *_Nullable) username {
 	if( ! [self _silcClient] ) return nil;
 	return [NSString stringWithUTF8String:[self _silcClient] -> username];
 }
@@ -1166,7 +1166,7 @@ static SilcClientOperations silcClientOps = {
 
 #pragma mark -
 
-- (void) sendCommand:(NSString *) command withArguments:(MVChatString * __nullable) arguments {
+- (void) sendCommand:(NSString *) command withArguments:(MVChatString * _Nullable) arguments {
 #if USE(ATTRIBUTED_CHAT_STRING)
 	NSString *argumentsString = [arguments string];
 #elif USE(PLAIN_CHAT_STRING) || USE(HTML_CHAT_STRING)
@@ -1209,7 +1209,7 @@ static SilcClientOperations silcClientOps = {
 
 #pragma mark -
 
-- (void) joinChatRoomNamed:(NSString *) room withPassphrase:(NSString * __nullable) passphrase {
+- (void) joinChatRoomNamed:(NSString *) room withPassphrase:(NSString * _Nullable) passphrase {
 	NSParameterAssert( room != nil );
 	NSParameterAssert( room.length > 0 );
 	if( passphrase.length ) [self sendRawMessageWithFormat:@"JOIN %@ %@", [self properNameForChatRoomNamed:room], passphrase];
@@ -1325,7 +1325,7 @@ static void usersFoundCallback( SilcClient client, SilcClientConnection conn, Si
 	}
 }
 
-- (void) setAwayStatusMessage:(MVChatString * __nullable) message {
+- (void) setAwayStatusMessage:(MVChatString * _Nullable) message {
 	if( ! [self _silcConn] ) return;
 
 	_awayMessage = nil;
@@ -1414,7 +1414,7 @@ static void usersFoundCallback( SilcClient client, SilcClientConnection conn, Si
 
 #pragma mark -
 
-- (void) _setSilcConn:(SilcClientConnection __nullable) aSilcConn {
+- (void) _setSilcConn:(SilcClientConnection _Nullable) aSilcConn {
 	_silcConn = aSilcConn;
 }
 
@@ -1482,7 +1482,7 @@ static void usersFoundCallback( SilcClient client, SilcClientConnection conn, Si
 
 #pragma mark -
 
-- (void) _setDetachInfo:(NSData * __nullable) info {
+- (void) _setDetachInfo:(NSData * _Nullable) info {
 	@synchronized( _persistentInformation ) {
 		if( info ) [_persistentInformation setObject:info forKey:@"detachData"];
 		else [_persistentInformation removeObjectForKey:@"detachData"];

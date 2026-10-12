@@ -23,6 +23,10 @@ COLLOQUY_EXPORT
 - (IBAction) hideTransferManager:(id) sender;
 
 - (void) downloadFileAtURL:(NSURL *) url toLocalFile:(NSString *) path;
+
+// A file finished downloading to this path: refresh the workspace's view of it
+// and open it if the user asked for safe files to be opened automatically.
+- (void) fileAtPathDidFinish:(NSString *) path;
 - (void) addFileTransfer:(MVFileTransfer *) transfer;
 
 - (IBAction) stopSelectedTransfer:(id) sender;

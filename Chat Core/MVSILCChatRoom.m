@@ -59,7 +59,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 #pragma mark -
 
-- (void) partWithReason:(MVChatString * __nullable) reason {
+- (void) partWithReason:(MVChatString * _Nullable) reason {
 	if( ! [self isJoined] ) return;
 	if( reason.length ) [[self connection] sendRawMessageWithFormat:@"LEAVE %@ %@", [self name], reason];
 	else [[self connection] sendRawMessageWithFormat:@"LEAVE %@", [self name]];
@@ -102,7 +102,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 #pragma mark -
 
-- (void) setMode:(MVChatRoomMode) mode withAttribute:(id __nullable) attribute {
+- (void) setMode:(MVChatRoomMode) mode withAttribute:(id _Nullable) attribute {
 	[super setMode:mode withAttribute:attribute];
 
 	switch( mode ) {
@@ -210,7 +210,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 #pragma mark -
 
-- (void) kickOutMemberUser:(MVChatUser *) user forReason:(MVChatString * __nullable) reason {
+- (void) kickOutMemberUser:(MVChatUser *) user forReason:(MVChatString * _Nullable) reason {
 	SilcBuffer roomBuffer, userBuffer;
 	MVSILCChatUser *silcUser = (MVSILCChatUser *) user;
 

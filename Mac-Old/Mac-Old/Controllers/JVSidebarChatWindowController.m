@@ -21,7 +21,7 @@
 	[chatViewsOutlineView setSelectionHighlightStyle:NSTableViewSelectionHighlightStyleSourceList];
 
 	if( ! [[NSUserDefaults standardUserDefaults] boolForKey:@"JVSidebarSelectedRowHasBlackText"] )
-		[[[chatViewsOutlineView outlineTableColumn] dataCell] setBoldAndWhiteOnHighlight:YES];
+		[(JVDetailCell *)[[chatViewsOutlineView outlineTableColumn] dataCell] setBoldAndWhiteOnHighlight:YES];
 
 	[mainSplitView setMainSubviewIndex:1];
 	[mainSplitView setPositionUsingName:@"JVSidebarSplitViewPosition"];
@@ -36,6 +36,8 @@
 
 - (void) outlineView:(NSOutlineView *) outlineView willDisplayCell:(id) cell forTableColumn:(NSTableColumn *) tableColumn item:(id) item {
 	[super outlineView:outlineView willDisplayCell:cell forTableColumn:tableColumn item:item];
+
+	if( ! [cell isKindOfClass:[JVDetailCell class]] ) return;
 
 	if( [outlineView levelForItem:item] )
 		[(JVDetailCell *)cell setLeftMargin:12.];

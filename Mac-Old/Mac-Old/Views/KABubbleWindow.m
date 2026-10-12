@@ -3,25 +3,25 @@
 @implementation KABubbleWindow
 
 - (id)initWithContentRect:(NSRect)contentRect
-				styleMask:(unsigned int)aStyle
+				styleMask:(NSUInteger)aStyle
 				  backing:(NSBackingStoreType)bufferingType
 					defer:(BOOL)flag {
-	
-	//use NSWindow to draw for us
-	NSWindow* result = [super initWithContentRect:contentRect 
-										styleMask:NSBorderlessWindowMask 
-										  backing:NSBackingStoreBuffered 
-											defer:NO];
-	
-	//set up our window
-	[result setBackgroundColor: [NSColor clearColor]];
-	[result setLevel: NSStatusWindowLevel];
-	[result setAlphaValue:0.15];
-	[result setOpaque:NO];
-	[result setHasShadow: YES];
-	[result setCanHide:NO ];
-	
-	return result;
+
+	// The bubble is always borderless regardless of the style asked for.
+	if( ! ( self = [super initWithContentRect:contentRect
+									styleMask:NSBorderlessWindowMask
+									  backing:NSBackingStoreBuffered
+										defer:NO] ) )
+		return nil;
+
+	[self setBackgroundColor: [NSColor clearColor]];
+	[self setLevel: NSStatusWindowLevel];
+	[self setAlphaValue:0.15];
+	[self setOpaque:NO];
+	[self setHasShadow: YES];
+	[self setCanHide:NO ];
+
+	return self;
 }
 
 @end

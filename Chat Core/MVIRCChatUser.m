@@ -51,7 +51,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 #pragma mark -
 
-- (NSString *__nullable) maskRepresentation {
+- (NSString *_Nullable) maskRepresentation {
 	return [NSString stringWithFormat:@"%@!%@@%@", (self.nickname ?: @""), (self.username ?: @""), (self.address ?: @"")];
 }
 
@@ -83,7 +83,7 @@ NS_ASSUME_NONNULL_BEGIN
 	[self persistLastActivityDate];
 }
 
-- (void) sendSubcodeRequest:(NSString *) command withArguments:(id __nullable) arguments {
+- (void) sendSubcodeRequest:(NSString *) command withArguments:(id _Nullable) arguments {
 	NSParameterAssert( command != nil );
 
 	MVChatConnection *connection = [self connection];
@@ -98,7 +98,7 @@ NS_ASSUME_NONNULL_BEGIN
 	[self persistLastActivityDate];
 }
 
-- (void) sendSubcodeReply:(NSString *) command withArguments:(id __nullable) arguments {
+- (void) sendSubcodeReply:(NSString *) command withArguments:(id _Nullable) arguments {
 	NSParameterAssert( command != nil );
 
 	MVChatConnection *connection = [self connection];

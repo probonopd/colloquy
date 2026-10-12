@@ -21,6 +21,12 @@
 
 - (id) copyWithZone:(NSZone *) zone {
 	JVDetailCell *cell = (JVDetailCell *)[super copyWithZone:zone];
+#ifdef GNUSTEP
+	GSForgetCopiedIvar( (void *)&cell -> _statusImage );
+	GSForgetCopiedIvar( (void *)&cell -> _altImage );
+	GSForgetCopiedIvar( (void *)&cell -> _mainText );
+	GSForgetCopiedIvar( (void *)&cell -> _infoText );
+#endif
 	cell -> _statusImage = _statusImage;
 	cell -> _altImage = _altImage;
 	cell -> _mainText = [_mainText copyWithZone:zone];

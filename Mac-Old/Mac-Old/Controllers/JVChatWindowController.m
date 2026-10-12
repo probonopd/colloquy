@@ -791,6 +791,10 @@ NSString *JVChatViewPboardType = @"Colloquy Chat View v1.0 pasteboard type";
 #pragma mark -
 
 - (void) outlineView:(NSOutlineView *) outlineView willDisplayCell:(id) cell forTableColumn:(NSTableColumn *) tableColumn item:(id) item {
+	// The outline can be drawn before -windowDidLoad has replaced the column's
+	// cell with ours, in which case there is nothing of ours to configure.
+	if( ! [cell isKindOfClass:[JVDetailCell class]] ) return;
+
 	[(JVDetailCell *) cell setRepresentedObject:item];
 	[(JVDetailCell *) cell setMainText:[item title]];
 
@@ -969,7 +973,7 @@ NSString *JVChatViewPboardType = @"Colloquy Chat View v1.0 pasteboard type";
 
 @implementation JVChatWindowController (Private)
 - (void) _claimMenuCommands {
-	NSMenuItem *closeItem = [[[[[NSApplication sharedApplication] mainMenu] itemAtIndex:1] submenu] itemWithTag:1];
+	NSMenuItem *closeItem = (NSMenuItem *)[[[[[NSApplication sharedApplication] mainMenu] itemAtIndex:1] submenu] itemWithTag:1];
 	[closeItem setKeyEquivalentModifierMask:NSCommandKeyMask];
 	[closeItem setKeyEquivalent:@"W"];
 
@@ -979,7 +983,7 @@ NSString *JVChatViewPboardType = @"Colloquy Chat View v1.0 pasteboard type";
 }
 
 - (void) _resignMenuCommands {
-	NSMenuItem *closeItem = [[[[[NSApplication sharedApplication] mainMenu] itemAtIndex:1] submenu] itemWithTag:1];
+	NSMenuItem *closeItem = (NSMenuItem *)[[[[[NSApplication sharedApplication] mainMenu] itemAtIndex:1] submenu] itemWithTag:1];
 	[closeItem setKeyEquivalentModifierMask:NSCommandKeyMask];
 	[closeItem setKeyEquivalent:@"w"];
 

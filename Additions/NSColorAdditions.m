@@ -4,7 +4,7 @@
 NS_ASSUME_NONNULL_BEGIN
 
 @interface NSAEDescriptorTranslator : NSObject // Private Foundation Class
-+ (id) _descriptorByTranslatingColor:(NSColor *) color ofType:(id __nullable) type inSuite:(id __nullable) suite;
++ (id) _descriptorByTranslatingColor:(NSColor *) color ofType:(id _Nullable) type inSuite:(id _Nullable) suite;
 @end
 
 #pragma mark -

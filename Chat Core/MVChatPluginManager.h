@@ -21,11 +21,11 @@ COLLOQUY_EXPORT
 - (void) removePlugin:(id) plugin;
 
 - (NSArray *) pluginsThatRespondToSelector:(SEL) selector;
-- (NSArray *) pluginsOfClass:(Class __nullable) class thatRespondToSelector:(SEL) selector;
+- (NSArray *) pluginsOfClass:(Class _Nullable) class thatRespondToSelector:(SEL) selector;
 
 - (NSArray *) makePluginsPerformInvocation:(NSInvocation *) invocation;
 - (NSArray *) makePluginsPerformInvocation:(NSInvocation *) invocation stoppingOnFirstSuccessfulReturn:(BOOL) stop;
-- (NSArray *) makePluginsOfClass:(Class __nullable) class performInvocation:(NSInvocation *) invocation stoppingOnFirstSuccessfulReturn:(BOOL) stop;
+- (NSArray *) makePluginsOfClass:(Class _Nullable) class performInvocation:(NSInvocation *) invocation stoppingOnFirstSuccessfulReturn:(BOOL) stop;
 @end
 
 @protocol MVChatPlugin <NSObject>

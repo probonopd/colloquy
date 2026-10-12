@@ -1,6 +1,5 @@
 #import "MVDirectClientConnection.h"
 
-@import CocoaAsyncSocket;
 
 #import "InterThreadMessaging.h"
 #import "MVChatConnectionPrivate.h"
@@ -27,7 +26,7 @@ void MVFindDCCFriendlyAddress( NSString *address, MVStringParameterBlock complet
 			addr = [[NSString alloc] initWithData:result encoding:NSASCIIStringEncoding];
 		if( addr && [addr rangeOfString:@"."].location != NSNotFound )
 			addr = [NSString stringWithFormat:@"%u", ntohl( inet_addr( [addr UTF8String] ) )];
-		dispatch_async(dispatch_get_main_queue(), ^{
+		CQQueueAsync(CQQueueMain(), ^{
 			completion(addr);
 		});
 	}] resume];
@@ -145,7 +144,7 @@ void MVFindDCCFriendlyAddress( NSString *address, MVStringParameterBlock complet
 
 #pragma mark -
 
-- (void) setDelegate:(id __nullable) delegate {
+- (void) setDelegate:(id _Nullable) delegate {
 	_delegate = delegate;
 }
 
@@ -338,7 +337,7 @@ void MVFindDCCFriendlyAddress( NSString *address, MVStringParameterBlock complet
 
 		NSString *bundleIdentifier = [[NSBundle mainBundle] bundleIdentifier];
 		NSString *queueName = [NSString stringWithFormat:@"%@.connection-queue (%@)", bundleIdentifier, [self description]];
-		_connectionDelegateQueue = dispatch_queue_create([queueName UTF8String], DISPATCH_QUEUE_SERIAL);
+		_connectionDelegateQueue = CQQueueCreate([queueName UTF8String], DISPATCH_QUEUE_SERIAL);
 		_connectionThread = [NSThread currentThread];
 		[_connectionThread setName:[self description]];
 		[NSThread prepareForInterThreadMessages];

@@ -36,7 +36,7 @@ NSString *criteria[4] = { @"server", @"target", @"session", nil };
 		c = [_dirtyLogs count];
 	}
 
-	if( c > 1 ) [statusText setStringValue:[NSString stringWithFormat:NSLocalizedString( @"%d logs still have to be indexed", "number of transcripts indexing remains message" ),c]];
+	if( c > 1 ) [statusText setStringValue:[NSString stringWithFormat:NSLocalizedString( @"%lu logs still have to be indexed", "number of transcripts indexing remains message" ),(unsigned long)c]];
 	else if( c == 1 ) [statusText setStringValue:NSLocalizedString( @"One log still has to be indexed", "one  indexing remains message" )];
 	else [statusText setStringValue:NSLocalizedString( @"Indexing is complete", "transcripts indexing finished message" )];
 }
@@ -97,7 +97,7 @@ NSString *criteria[4] = { @"server", @"target", @"session", nil };
 		while( ( logPath = [logsEnum nextObject] ) ) {
 			if( [[logPath pathExtension] isEqualToString:@"colloquyTranscript"] ) {
 				// analyze the path
-				NSTextCheckingResult *match = [regex matchesInString:logPath options:NSMatchingReportCompletion range:NSMakeRange( 0, logPath.length )];
+				NSTextCheckingResult *match = [regex firstMatchInString:logPath options:NSMatchingReportCompletion range:NSMakeRange( 0, logPath.length )];
 
 				NSString *server = [logPath substringWithRange:[match rangeAtIndex:serverIndex]];
 				NSString *target = [logPath substringWithRange:[match rangeAtIndex:targetIndex]];

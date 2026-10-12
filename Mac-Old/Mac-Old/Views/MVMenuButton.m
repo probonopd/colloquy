@@ -105,7 +105,7 @@
 }
 
 - (void) setImage:(NSImage *) image {
-	_orgImage = [[self image] copy];
+	_orgImage = [image copy];
 
 	NSRect rect = NSMakeRect( 0., 0., 24., 24. );
 	NSImageRep *sourceImageRep = [_orgImage bestRepresentationForRect:rect context:[NSGraphicsContext currentContext] hints:nil];

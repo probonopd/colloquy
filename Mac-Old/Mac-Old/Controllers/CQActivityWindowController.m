@@ -26,84 +26,10 @@ NSString *CQActivityStatusRejected = @"CQActivityStatusRejected";
 NSString *CQDirectChatConnectionKey = @"CQDirectChatConnectionKey";
 NSString *CQDirectDownloadKey = @"CQDirectDownloadKey";
 
-MVInline double CQUnitKilobyte (void);
-MVInline double CQUnitMegabyte (void);
-MVInline double CQUnitGigabyte (void);
-MVInline double CQUnitTerabyte (void);
-
-MVInline double CQUnitKilobyte (void) {
-	static NSUInteger result = 0;
-	if (!result)
-		result = (floor(NSAppKitVersionNumber) <= NSAppKitVersionNumber10_5) ? 1024 : 1000;
-	return result;
-}
-
-MVInline double CQUnitMegabyte (void) {
-	static NSUInteger result = 0;
-	if (!result)
-		result = CQUnitKilobyte() * CQUnitKilobyte();
-	return result;
-}
-
-MVInline double CQUnitGigabyte (void) {
-	static NSUInteger result = 0;
-	if (!result)
-		result = CQUnitMegabyte() * CQUnitKilobyte();
-	return result;
-}
-
-MVInline double CQUnitTerabyte (void) {
-	static NSUInteger result = 0;
-	if (!result)
-		result = CQUnitGigabyte() * CQUnitKilobyte();
-	return result;
-}
-
-NSString *MVPrettyFileSize (CQFileSize size) {
-	if (size == 0) return NSLocalizedString(@"Zero bytes", "no file size");
-	if (size < CQUnitKilobyte()) return [NSString stringWithFormat:NSLocalizedString(@"%lu bytes", "file size measured in bytes"), size];
-	if (size < CQUnitMegabyte()) return [NSString stringWithFormat:NSLocalizedString(@"%.0f KB", "file size measured in kilobytes"),  (size / CQUnitKilobyte())];
-	if (size < CQUnitGigabyte()) return [NSString stringWithFormat:NSLocalizedString(@"%.1f MB", "file size measured in megabytes"),  (size / CQUnitMegabyte())];
-	if (size < CQUnitTerabyte()) return [NSString stringWithFormat:NSLocalizedString(@"%.2f GB", "file size measured in gigabytes"),  (size / CQUnitGigabyte())];
-	return [NSString stringWithFormat:NSLocalizedString(@"%.3f TB", "file size measured in terabytes"),  (size / CQUnitTerabyte())];
-}
-
-NSString *MVReadableTime (NSTimeInterval date, BOOL longFormat) {
-	NSTimeInterval secs = [[NSDate date] timeIntervalSince1970] - date;
-	static NSArray *desc = nil;
-	if (!desc)
-		desc = [[NSArray alloc] initWithObjects:NSLocalizedString(@"second", "singular second"), NSLocalizedString(@"minute", "singular minute"), NSLocalizedString(@"hour", "singular hour"), NSLocalizedString(@"day", "singular day"), NSLocalizedString(@"week", "singular week"), NSLocalizedString(@"month", "singular month"), NSLocalizedString(@"year", "singular year"), nil];
-	static NSArray *plural = nil;
-	if (!plural)
-		plural = [[NSArray alloc] initWithObjects:NSLocalizedString(@"seconds", "plural seconds"), NSLocalizedString(@"minutes", "plural minutes"), NSLocalizedString(@"hours", "plural hours"), NSLocalizedString(@"days", "plural days"), NSLocalizedString(@"weeks", "plural weeks"), NSLocalizedString(@"months", "plural months"), NSLocalizedString(@"years", "plural years"), nil];
-	static NSArray *values = nil;
-	if (!values)
-		values = [[NSArray alloc] initWithObjects:[NSNumber numberWithUnsignedInteger:1], [NSNumber numberWithUnsignedInteger:60], [NSNumber numberWithUnsignedInteger:3600], [NSNumber numberWithUnsignedInteger:86400], [NSNumber numberWithUnsignedInteger:604800], [NSNumber numberWithUnsignedInteger:2628000], [NSNumber numberWithUnsignedInteger:31536000], nil];
-
-	if (secs < 0)
-		secs = fabs(secs);
-
-	NSUInteger i = 0;
-	while (i < values.count && secs >= [[values objectAtIndex:i] doubleValue]) i++;
-	if (i) i--;
-
-	NSUInteger stop = [[values objectAtIndex:i] unsignedIntegerValue];
-	NSUInteger val = (NSUInteger)(secs / (float)stop);
-	NSArray *use = (val > 1 ? plural : desc);
-	NSString *retval = [NSString stringWithFormat:@"%u %@", val, [use objectAtIndex:i]];
-	if (!longFormat || i <= 0)
-		return retval;
-
-	NSUInteger rest = (NSUInteger)((NSUInteger)secs % stop);
-	stop = [[values objectAtIndex:--i] unsignedIntegerValue];
-	rest = (NSUInteger)(rest / (float)stop);
-	if (rest > 0) {
-		use =  (rest > 1 ? plural : desc);
-		retval = [retval stringByAppendingFormat:@" %u %@", rest, [use objectAtIndex:i--]];
-	}
-
-	return retval;
-}
+// MVPrettyFileSize and MVReadableTime are defined in MVFileTransferController.m
+// (the canonical copy declared in MVFileTransferController.h); the duplicate
+// definitions that used to live here, and the byte-unit helpers that only fed
+// them, were removed to avoid duplicate symbols at link time.
 
 @interface CQActivityWindowController (Private)
 - (void) _loadImagesForButtonsWithFormat:(NSString *) format;
@@ -783,14 +709,14 @@ NSString *MVReadableTime (NSTimeInterval date, BOOL longFormat) {
 			if (fileTransfers) {
 				if (fileTransfers > 1)
 					return [NSString stringWithFormat:NSLocalizedString(@"%ld file transfers and 1 chat room invite on %@", @"tooltip"), fileTransfers, ((MVChatConnection *)item).server];
-				return [NSString stringWithFormat:NSLocalizedString(@"1 file transfer and 1 chat room invite on %@", @"tooltip"), fileTransfers, ((MVChatConnection *)item).server];
+				return [NSString stringWithFormat:NSLocalizedString(@"1 file transfer and 1 chat room invite on %@", @"tooltip"), ((MVChatConnection *)item).server];
 			}
-			return [NSString stringWithFormat:NSLocalizedString(@"1 chat room invite on %@", @"tooltip"), fileTransfers, ((MVChatConnection *)item).server];
+			return [NSString stringWithFormat:NSLocalizedString(@"1 chat room invite on %@", @"tooltip"), ((MVChatConnection *)item).server];
 		}
 		if (fileTransfers) {
 			if (fileTransfers > 1)
 				return [NSString stringWithFormat:NSLocalizedString(@"%ld file transfers on %@", @"tooltip"), fileTransfers, ((MVChatConnection *)item).server];
-			return [NSString stringWithFormat:NSLocalizedString(@"1 file transfer on %@", @"tooltip"), fileTransfers, ((MVChatConnection *)item).server];
+			return [NSString stringWithFormat:NSLocalizedString(@"1 file transfer on %@", @"tooltip"), ((MVChatConnection *)item).server];
 		}
 	}
 	if (item == CQDirectChatConnectionKey) {

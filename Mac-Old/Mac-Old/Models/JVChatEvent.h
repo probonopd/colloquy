@@ -6,7 +6,7 @@
 	/* xmlDoc */ void *_doc;
 	NSString *_eventIdentifier;
 	NSScriptObjectSpecifier *_objectSpecifier;
-	__weak JVChatTranscript *_transcript;
+	JVChatTranscript *_transcript;
 	NSDate *_date;
 	NSString *_name;
 	NSTextStorage *_message;

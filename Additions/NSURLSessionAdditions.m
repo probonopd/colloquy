@@ -4,7 +4,7 @@
 + (NSURLSession *) CQ_backgroundSession {
 	static NSURLSession *backgroundSession = nil;
 	static dispatch_once_t onceToken;
-	dispatch_once(&onceToken, ^{
+	CQQueueOnce(&onceToken, ^{
 		NSURLSessionConfiguration *configuration = [NSURLSessionConfiguration backgroundSessionConfigurationWithIdentifier:@"info.colloquy.mobi.backgroundSession"];
 		configuration.discretionary = YES;
 		configuration.allowsCellularAccess = YES;

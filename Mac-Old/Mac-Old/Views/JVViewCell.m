@@ -9,6 +9,15 @@
     _view = nil;
 }
 
+#ifdef GNUSTEP
+- (id) copyWithZone:(NSZone *) zone {
+	JVViewCell *cell = [super copyWithZone:zone];
+	GSForgetCopiedIvar( (void *)&cell -> _view );
+	cell -> _view = _view;
+	return cell;
+}
+#endif
+
 - (void) setView:(NSView *) view {
     _view = view;
 }

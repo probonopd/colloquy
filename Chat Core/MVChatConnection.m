@@ -1,6 +1,5 @@
 #import "MVChatConnection.h"
 
-@import CocoaAsyncSocket;
 
 #import "MVChatConnectionPrivate.h"
 #import "MVChatRoom.h"
@@ -117,7 +116,7 @@ static const NSStringEncoding supportedEncodings[] = {
 };
 
 @implementation MVChatConnection
-+ (BOOL) supportsURLScheme:(NSString *__nullable) scheme {
++ (BOOL) supportsURLScheme:(NSString *_Nullable) scheme {
 	return
 #if ENABLE(ICB)
 		[scheme isEqualToString:@"icb"] ||
@@ -301,7 +300,7 @@ static const NSStringEncoding supportedEncodings[] = {
 		CFRelease(_reachability);
 	}
 
-	for (MVChatUser *user in [_knownUsers objectEnumerator]) {
+	for (MVChatUser *user in NSAllMapTableValues(_knownUsers)) {
 		[user _connectionDestroyed];
 	}
 	[[_knownRooms allValues] makeObjectsPerformSelector:@selector(_connectionDestroyed)];
@@ -390,7 +389,7 @@ static const NSStringEncoding supportedEncodings[] = {
 	[self disconnectWithReason:nil];
 }
 
-- (void) disconnectWithReason:(MVChatString * __nullable) reason {
+- (void) disconnectWithReason:(MVChatString * _Nullable) reason {
 // subclass this method
 	[self doesNotRecognizeSelector:_cmd];
 }
@@ -478,11 +477,11 @@ static const NSStringEncoding supportedEncodings[] = {
 	_nextAltNickIndex = 0;
 }
 
-- (NSArray <NSString *> *__nullable) alternateNicknames {
+- (NSArray <NSString *> *_Nullable) alternateNicknames {
 	return [_alternateNicks copy];
 }
 
-- (NSString *__nullable) nextAlternateNickname {
+- (NSString *_Nullable) nextAlternateNickname {
 	if( [[self alternateNicknames] count] && _nextAltNickIndex < [[self alternateNicknames] count] )
 		return [self alternateNicknames][_nextAltNickIndex++];
 	return nil;
@@ -632,7 +631,7 @@ static void reachabilityCallback( SCNetworkReachabilityRef target, SCNetworkConn
 
 #pragma mark -
 
-- (void) sendCommand:(NSString *) command withArguments:(MVChatString * __nullable) arguments {
+- (void) sendCommand:(NSString *) command withArguments:(MVChatString * _Nullable) arguments {
 	// subclass this method, don't call super
 	[self doesNotRecognizeSelector:_cmd];
 }
@@ -755,7 +754,7 @@ static void reachabilityCallback( SCNetworkReachabilityRef target, SCNetworkConn
 	[self joinChatRoomNamed:room withPassphrase:nil];
 }
 
-- (void) joinChatRoomNamed:(NSString *) room withPassphrase:(NSString * __nullable) passphrase {
+- (void) joinChatRoomNamed:(NSString *) room withPassphrase:(NSString * _Nullable) passphrase {
 // subclass this method
 	[self doesNotRecognizeSelector:_cmd];
 }
@@ -799,7 +798,7 @@ static void reachabilityCallback( SCNetworkReachabilityRef target, SCNetworkConn
 	}
 }
 
-- (MVChatRoom *__nullable) chatRoomWithName:(NSString *) name {
+- (MVChatRoom *_Nullable) chatRoomWithName:(NSString *) name {
 	@synchronized( _knownRooms ) {
 		for( id key in _knownRooms ) {
 			MVChatRoom *room = _knownRooms[key];
@@ -829,7 +828,7 @@ static void reachabilityCallback( SCNetworkReachabilityRef target, SCNetworkConn
 
 - (NSSet *) knownChatUsers {
 	@synchronized( _knownUsers ) {
-		return [NSSet setWithArray:[[_knownUsers objectEnumerator] allObjects]];
+		return [NSSet setWithArray:NSAllMapTableValues(_knownUsers)];
 	}
 }
 
@@ -912,7 +911,7 @@ static void reachabilityCallback( SCNetworkReachabilityRef target, SCNetworkConn
 	return _awayMessage;
 }
 
-- (void) setAwayStatusMessage:(MVChatString * __nullable) message {
+- (void) setAwayStatusMessage:(MVChatString * _Nullable) message {
 // subclass this method
 	[self doesNotRecognizeSelector:_cmd];
 }
@@ -1285,7 +1284,7 @@ static void reachabilityCallback( SCNetworkReachabilityRef target, SCNetworkConn
  @warning This is not particularily safe, since the order of the underlying array is not guaranteed to remain the same between calls.
  */
 - (NSArray <MVChatUser *> *) knownChatUsersArray {
-	return [[_knownUsers objectEnumerator] allObjects] ?: @[];
+	return NSAllMapTableValues(_knownUsers) ?: @[];
 }
 
 /**

@@ -1,0 +1,29 @@
+%!PS-Adobe-3.0 EPSF-3.0
+%%BoundingBox: 0 0 14 14
+%
+% Copyright (c) 2026 Simon Peter
+%
+% SPDX-License-Identifier: BSD-2-Clause
+%
+% Gear shown on action menu buttons; GNUstep has no NSActionTemplate.
+/teeth 8 def
+/outer 6.6 def
+/inner 4.9 def
+/halfTooth 11 def
+7 7 translate
+newpath
+0 1 teeth 1 sub {
+	/i exch def
+	/a i 360 teeth div mul def
+	/b a 360 teeth div add def
+	a halfTooth sub cos inner mul a halfTooth sub sin inner mul
+	i 0 eq { moveto } { lineto } ifelse
+	a halfTooth sub 3 add cos outer mul a halfTooth sub 3 add sin outer mul lineto
+	a halfTooth add 3 sub cos outer mul a halfTooth add 3 sub sin outer mul lineto
+	a halfTooth add cos inner mul a halfTooth add sin inner mul lineto
+	0 0 inner a halfTooth add b halfTooth sub arc
+} for
+closepath
+2.1 0 moveto 0 0 2.1 0 360 arc closepath
+0 setgray eofill
+showpage

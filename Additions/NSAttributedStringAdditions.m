@@ -739,6 +739,9 @@ NSString *NSChatCTCPTwoFormatType = @"NSChatCTCPTwoFormatType";
 		case 0x8000020A:
 			ctcpEncoding = "10";
 			break;
+		default:
+			// Encodings without a CTCP tag are sent untagged.
+			break;
 		}
 	}
 

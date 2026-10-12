@@ -8,7 +8,7 @@ NS_ASSUME_NONNULL_BEGIN
 #if ENABLE(CHAT_CENTER)
 	static NSNotificationCenter *chatCenter = nil;
 	static dispatch_once_t onceToken;
-	dispatch_once(&onceToken, ^{
+	CQQueueOnce(&onceToken, ^{
 		chatCenter = [[NSNotificationCenter alloc] init];
 	});
 	return chatCenter;
@@ -17,33 +17,40 @@ NS_ASSUME_NONNULL_BEGIN
 #endif
 }
 - (void) postNotificationOnMainThread:(NSNotification *) notification {
-	if( pthread_main_np() ) [self postNotification:notification];
+	if( [NSThread isMainThread] ) [self postNotification:notification];
 	else [self postNotificationOnMainThread:notification waitUntilDone:NO];
 }
 
 - (void) postNotificationOnMainThread:(NSNotification *) notification waitUntilDone:(BOOL) wait {
-	if( pthread_main_np() ) [self postNotification:notification];
-	else [[self class] performSelectorOnMainThread:@selector( _postNotification: ) withObject:@{ @"notification": notification, @"center": self } waitUntilDone:wait];
+	if( [NSThread isMainThread] ) [self postNotification:notification];
+	else {
+		// GNUstep's performSelectorOnMainThread: marshals the argument object
+		// across the Distributed Objects connection, which corrupts the
+		// userInfo (JVChatMessage, MVChatRoom, etc. do not survive the
+		// serialization). Schedule on the main run loop instead, which only
+		// retains the argument.
+		[[NSRunLoop mainRunLoop] performSelector:@selector( _postNotification: ) target:[self class] argument:@{ @"notification": notification, @"center": self } order:0 modes:[NSArray arrayWithObject:NSDefaultRunLoopMode]];
+	}
 }
 
 + (void) _postNotification:(NSDictionary *) info {
-	NSNotification *__nonnull notification = (NSNotification *__nonnull)info[@"notification"];
+	NSNotification *_Nonnull notification = (NSNotification *_Nonnull)info[@"notification"];
 	[info[@"center"] postNotification:notification];
 }
 
-- (void) postNotificationOnMainThreadWithName:(NSString *) name object:(id __nullable) object {
-	if( pthread_main_np() ) [self postNotificationName:name object:object userInfo:nil];
+- (void) postNotificationOnMainThreadWithName:(NSString *) name object:(id _Nullable) object {
+	if( [NSThread isMainThread] ) [self postNotificationName:name object:object userInfo:nil];
 	else [self postNotificationOnMainThreadWithName:name object:object userInfo:@{} waitUntilDone:NO];
 }
 
-- (void) postNotificationOnMainThreadWithName:(NSString *) name object:(id __nullable) object userInfo:(NSDictionary * __nullable ) userInfo {
-	if( pthread_main_np() ) [self postNotificationName:name object:object userInfo:userInfo];
+- (void) postNotificationOnMainThreadWithName:(NSString *) name object:(id _Nullable) object userInfo:(NSDictionary * _Nullable ) userInfo {
+	if( [NSThread isMainThread] ) [self postNotificationName:name object:object userInfo:userInfo];
 	else [self postNotificationOnMainThreadWithName:name object:object userInfo:userInfo waitUntilDone:NO];
 }
 
-- (void) postNotificationOnMainThreadWithName:(NSString *) name object:(id __nullable) object userInfo:(NSDictionary * __nullable ) userInfo waitUntilDone:(BOOL) wait {
-	if( pthread_main_np() ) [self postNotificationName:name object:object userInfo:userInfo];
-	else {
+- (void) postNotificationOnMainThreadWithName:(NSString *) name object:(id _Nullable) object userInfo:(NSDictionary * _Nullable ) userInfo waitUntilDone:(BOOL) wait {
+	if( [NSThread isMainThread] ) [self postNotificationName:name object:object userInfo:userInfo];
+		else {
 		if ( !name ) return;
 		NSMutableDictionary *info = [[NSMutableDictionary alloc] initWithCapacity:3];
 		info[@"name"] = name;
@@ -52,12 +59,15 @@ NS_ASSUME_NONNULL_BEGIN
 		if( userInfo ) info[@"userInfo"] = userInfo;
 		info[@"center"] = self;
 
-		[[self class] performSelectorOnMainThread:@selector( _postNotificationName: ) withObject:info waitUntilDone:wait];
+		// GNUstep's performSelectorOnMainThread: marshals the argument across
+		// Distributed Objects and corrupts the userInfo. Schedule on the main
+		// run loop, which only retains the argument.
+		[[NSRunLoop mainRunLoop] performSelector:@selector( _postNotificationName: ) target:[self class] argument:info order:0 modes:[NSArray arrayWithObject:NSDefaultRunLoopMode]];
 	}
 }
 
 + (void) _postNotificationName:(NSDictionary *) info {
-	NSString *__nonnull name = (NSString *__nonnull)info[@"name"];
+	NSString *_Nonnull name = (NSString *_Nonnull)info[@"name"];
 	[info[@"center"] postNotificationName:name object:info[@"object"] userInfo:info[@"userInfo"]];
 }
 @end

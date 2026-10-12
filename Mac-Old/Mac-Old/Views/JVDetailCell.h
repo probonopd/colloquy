@@ -10,4 +10,8 @@
 
 @property BOOL boldAndWhiteOnHighlight;
 @property CGFloat leftMargin;
+
+// Redefine the superclass accessor as a property so it can be synthesized
+// with a backing ivar.
+@property NSLineBreakMode lineBreakMode;
 @end

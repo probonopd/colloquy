@@ -320,8 +320,8 @@ static NSMutableAttributedString *parseXHTMLTreeNode( xmlNode *node, NSDictionar
 
 	// catch well-formed urls like "http://www.apple.com", "www.apple.com" or "irc://irc.javelin.cc"
 	static NSDataDetector *linkDataDetector = nil;
-	static dispatch_once_t onceToken;
-	dispatch_once(&onceToken, ^{
+	static long onceToken = 0;
+	CQQueueOnce(&onceToken, ^{
 		linkDataDetector = [NSDataDetector dataDetectorWithTypes:NSTextCheckingTypeLink error:nil];
 	});
 

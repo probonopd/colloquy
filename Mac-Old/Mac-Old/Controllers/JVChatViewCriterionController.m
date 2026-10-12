@@ -27,9 +27,9 @@
 - (id) initWithCoder:(NSCoder *) coder {
 	if( [coder allowsKeyedCoding] ) {
 		self = [self init];
-		[self setKind:[coder decodeIntForKey:@"kind"]];
+		[self setKind:[coder decodeIntegerForKey:@"kind"]];
 		[self setQuery:[coder decodeObjectForKey:@"query"]];
-		[self setOperation:[coder decodeIntForKey:@"operation"]];
+		[self setOperation:[coder decodeIntegerForKey:@"operation"]];
 		return self;
 	}
 
@@ -218,7 +218,7 @@
 	if( [self format] == JVChatViewTextCriterionFormat ) {
 		[self setQuery:[textQuery stringValue]];
 	} else if( [self format] == JVChatViewListCriterionFormat ) {
-		NSMenuItem *mitem = [listQuery selectedItem];
+		NSMenuItem *mitem = (NSMenuItem *)[listQuery selectedItem];
 		if( [mitem representedObject] ) [self setQuery:[mitem representedObject]];
 		else [self setQuery:[NSNumber numberWithLong:[mitem tag]]];
 	}

@@ -1,6 +1,5 @@
 #import "MVIRCChatConnection.h"
 
-@import CocoaAsyncSocket;
 
 #import "MVIRCChatRoom.h"
 #import "MVIRCChatUser.h"
@@ -169,7 +168,7 @@ NSString *const MVIRCChatConnectionZNCPluginPlaybackFeature = @"MVIRCChatConnect
 
 #pragma mark Incoming Message Replies
 
-- (MVChatRoom*__nullable) _chatRoomFromMessageTarget:(NSString*)messageTarget;
+- (MVChatRoom*_Nullable) _chatRoomFromMessageTarget:(NSString*)messageTarget;
 
 - (void) _handlePrivmsg:(NSMutableDictionary *) privmsgInfo;
 - (void) _handlePrivmsgWithParameters:(NSArray *) parameters fromSender:(MVChatUser *) sender;
@@ -178,7 +177,7 @@ NSString *const MVIRCChatConnectionZNCPluginPlaybackFeature = @"MVIRCChatConnect
 - (void) _handleNoticeWithParameters:(NSArray *) parameters fromSender:(nullable MVChatUser *) sender;
 
 - (void) _handleCTCP:(NSDictionary *) ctcpInfo;
-- (void) _handleCTCP:(NSMutableData *) data asRequest:(BOOL) request fromSender:(MVChatUser *) sender toTarget:(id) target forRoom:(MVChatRoom *__nullable) room withTags:(NSDictionary *) tags;
+- (void) _handleCTCP:(NSMutableData *) data asRequest:(BOOL) request fromSender:(MVChatUser *) sender toTarget:(id) target forRoom:(MVChatRoom *_Nullable) room withTags:(NSDictionary *) tags;
 
 #pragma mark Room Replies
 
@@ -190,7 +189,7 @@ NSString *const MVIRCChatConnectionZNCPluginPlaybackFeature = @"MVIRCChatConnect
 - (void) _handleTopic:(NSDictionary *)topicInfo;
 - (void) _handleTopicWithParameters:(NSArray *) parameters fromSender:(MVChatUser *) sender;
 
-- (void) _parseRoomModes:(NSArray *) parameters forRoom:(MVChatRoom *) room fromSender:(MVChatUser *__nullable) sender;
+- (void) _parseRoomModes:(NSArray *) parameters forRoom:(MVChatRoom *) room fromSender:(MVChatUser *_Nullable) sender;
 - (void) _handleModeWithParameters:(NSArray *) parameters fromSender:(MVChatUser *) sender;
 /** RPL_CHANNELMODEIS */
 - (void) _handle324WithParameters:(NSArray *) parameters fromSender:(id) sender;
@@ -388,7 +387,7 @@ NSString *const MVIRCChatConnectionZNCPluginPlaybackFeature = @"MVIRCChatConnect
 	if( ( self = [super init] ) ) {
 		NSString *bundleIdentifier = [[NSBundle mainBundle] bundleIdentifier];
 		NSString *queueName = [bundleIdentifier stringByAppendingString:@".connection-queue"];
-		_connectionQueue = dispatch_queue_create([queueName UTF8String], DISPATCH_QUEUE_SERIAL);
+		_connectionQueue = CQQueueCreate([queueName UTF8String], DISPATCH_QUEUE_SERIAL);
 
 		_localUser = [[MVIRCChatUser alloc] initLocalUserWithConnection:self];
 
@@ -429,7 +428,7 @@ NSString *const MVIRCChatConnectionZNCPluginPlaybackFeature = @"MVIRCChatConnect
 	[self _connect];
 }
 
-- (void) disconnectWithReason:(MVChatString * __nullable) reason {
+- (void) disconnectWithReason:(MVChatString * _Nullable) reason {
 	[self performSelectorOnMainThread:@selector( cancelPendingReconnectAttempts ) withObject:nil waitUntilDone:YES];
 
 	if( _status == MVChatConnectionConnectedStatus ) {
@@ -449,7 +448,7 @@ NSString *const MVIRCChatConnectionZNCPluginPlaybackFeature = @"MVIRCChatConnect
 /// example WeeChat's proxy feature behaves this way). To protect the client, we close the connection from our end
 /// after a timeout period.
 - (void) _waitForDisconnectWithTimeout:(NSTimeInterval)timeout {
-	dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(timeout * NSEC_PER_SEC)), _connectionQueue, ^{
+	CQQueueAfter(CQQueueTime(DISPATCH_TIME_NOW, (int64_t)(timeout * NSEC_PER_SEC)), _connectionQueue, ^{
 		if (self.status == MVChatConnectionConnectedStatus && self->_userDisconnected == YES) {
 			[self._chatConnection disconnect];
 		}
@@ -458,18 +457,18 @@ NSString *const MVIRCChatConnectionZNCPluginPlaybackFeature = @"MVIRCChatConnect
 
 #pragma mark -
 
-- (void) setRealName:(NSString *__nullable) name {
+- (void) setRealName:(NSString *_Nullable) name {
 	NSParameterAssert( name != nil );
 	MVSafeCopyAssign( _realName, name );
 }
 
-- (NSString *__nullable) realName {
+- (NSString *_Nullable) realName {
 	return _realName;
 }
 
 #pragma mark -
 
-- (void) setNickname:(NSString *__nullable) newNickname {
+- (void) setNickname:(NSString *_Nullable) newNickname {
 	NSParameterAssert( newNickname.length > 0 );
 	NSParameterAssert( newNickname != nil );
 
@@ -488,7 +487,7 @@ NSString *const MVIRCChatConnectionZNCPluginPlaybackFeature = @"MVIRCChatConnect
 		[self sendRawMessageImmediatelyWithFormat:@"NICK %@", newNickname];
 }
 
-- (NSString *__nullable) nickname {
+- (NSString *_Nullable) nickname {
 	return _currentNickname;
 }
 
@@ -507,7 +506,7 @@ NSString *const MVIRCChatConnectionZNCPluginPlaybackFeature = @"MVIRCChatConnect
 
 #pragma mark -
 
-- (void) setNicknamePassword:(NSString * __nullable) newPassword {
+- (void) setNicknamePassword:(NSString * _Nullable) newPassword {
 	[super setNicknamePassword:newPassword];
 	_pendingIdentificationAttempt = NO;
 	if( [self isConnected] )
@@ -520,12 +519,12 @@ NSString *const MVIRCChatConnectionZNCPluginPlaybackFeature = @"MVIRCChatConnect
 
 #pragma mark -
 
-- (void) setUsername:(NSString *__nullable) newUsername {
+- (void) setUsername:(NSString *_Nullable) newUsername {
 	NSParameterAssert( newUsername.length > 0 );
 	MVSafeCopyAssign( _username, newUsername );
 }
 
-- (NSString *__nullable) username {
+- (NSString *_Nullable) username {
 	return _username;
 }
 
@@ -558,7 +557,7 @@ NSString *const MVIRCChatConnectionZNCPluginPlaybackFeature = @"MVIRCChatConnect
 
 #pragma mark -
 
-- (void) sendCommand:(NSString *) command withArguments:(MVChatString * __nullable) arguments {
+- (void) sendCommand:(NSString *) command withArguments:(MVChatString * _Nullable) arguments {
 	NSParameterAssert( command != nil );
 	[self _sendCommand:command withArguments:arguments withEncoding:[self encoding] toTarget:nil];
 }
@@ -598,7 +597,7 @@ NSString *const MVIRCChatConnectionZNCPluginPlaybackFeature = @"MVIRCChatConnect
 
 	if( now ) {
 		__weak __typeof__((self)) weakSelf = self;
-		dispatch_async(_connectionQueue, ^{
+		CQQueueAsync(_connectionQueue, ^{
 			__strong __typeof__((weakSelf)) strongSelf = weakSelf;
 			MVSafeAdoptAssign( strongSelf->_lastCommand, [[NSDate alloc] init] );
 			[self _writeDataToServer:raw];
@@ -612,7 +611,7 @@ NSString *const MVIRCChatConnectionZNCPluginPlaybackFeature = @"MVIRCChatConnect
 		}
 
 		if( ! _sendQueueProcessing ) {
-			dispatch_async(dispatch_get_main_queue(), ^{
+			CQQueueAsync(CQQueueMain(), ^{
 				[self _startSendQueue];
 			});
 		}
@@ -677,9 +676,11 @@ NSString *const MVIRCChatConnectionZNCPluginPlaybackFeature = @"MVIRCChatConnect
 	if( roomList.count ) [self sendRawMessageWithFormat:@"JOIN %@", [roomList componentsJoinedByString:@","]];
 }
 
-- (void) joinChatRoomNamed:(NSString *) room withPassphrase:(NSString * __nullable) passphrase {
+- (void) joinChatRoomNamed:(NSString *) room withPassphrase:(NSString * _Nullable) passphrase {
 	NSParameterAssert( room != nil );
 	NSParameterAssert( room.length > 0 );
+
+
 
 	if( !_pendingJoinRoomNames )
 		_pendingJoinRoomNames = [[NSMutableSet alloc] initWithCapacity:10];
@@ -729,7 +730,7 @@ NSString *const MVIRCChatConnectionZNCPluginPlaybackFeature = @"MVIRCChatConnect
 	return room;
 }
 
-- (MVChatRoom *__nullable) chatRoomWithName:(NSString *) name {
+- (MVChatRoom *_Nullable) chatRoomWithName:(NSString *) name {
 	return [self chatRoomWithUniqueIdentifier:[self properNameForChatRoomNamed:name]];
 }
 
@@ -800,7 +801,7 @@ NSString *const MVIRCChatConnectionZNCPluginPlaybackFeature = @"MVIRCChatConnect
 		}
 	} else {
 		@synchronized( _knownUsers ) {
-			for (MVChatUser *user in [_knownUsers objectEnumerator]) {
+			for (MVChatUser *user in NSAllMapTableValues(_knownUsers)) {
 				[rule matchChatUser:user];
 			}
 		}
@@ -855,7 +856,7 @@ NSString *const MVIRCChatConnectionZNCPluginPlaybackFeature = @"MVIRCChatConnect
 
 #pragma mark -
 
-- (void) setAwayStatusMessage:(MVChatString * __nullable) message {
+- (void) setAwayStatusMessage:(MVChatString * _Nullable) message {
 	if( message.length ) {
 		MVSafeCopyAssign( _awayMessage, message );
 
@@ -911,6 +912,8 @@ NSString *const MVIRCChatConnectionZNCPluginPlaybackFeature = @"MVIRCChatConnect
 	NSString *server = (_bouncer != MVChatConnectionNoBouncer && _bouncerServer.length ? _bouncerServer : _server);
 	unsigned short serverPort = (_bouncer != MVChatConnectionNoBouncer ? (_bouncerServerPort ? _bouncerServerPort : 6667) : _serverPort);
 
+	_chatConnection.tlsEnabled = (_secure && _bouncer != MVChatConnectionColloquyBouncer);
+
 	if( ! [_chatConnection connectToHost:server onPort:serverPort error:NULL] )
 		[self performSelectorOnMainThread:@selector( _didNotConnect ) withObject:nil waitUntilDone:NO];
 	else [self _resetSendQueueInterval];
@@ -955,7 +958,7 @@ NSString *const MVIRCChatConnectionZNCPluginPlaybackFeature = @"MVIRCChatConnect
 	if (!trust || !completionHandler)
 		return;
 
-	SecTrustEvaluateAsync(trust, dispatch_get_main_queue(), ^(SecTrustRef trustRef, SecTrustResultType result) {
+	SecTrustEvaluateAsync(trust, CQQueueMain(), ^(SecTrustRef trustRef, SecTrustResultType result) {
 		if (result == kSecTrustResultProceed || result == kSecTrustResultUnspecified) {
 			completionHandler(YES);
 			return;
@@ -980,7 +983,7 @@ NSString *const MVIRCChatConnectionZNCPluginPlaybackFeature = @"MVIRCChatConnect
 	_chatConnection = nil;
 	[oldChatConnection setDelegate:nil];
 
-	dispatch_async(dispatch_get_main_queue(), ^{
+	CQQueueAsync(CQQueueMain(), ^{
 		[self _stopSendQueue];
 	});
 
@@ -998,7 +1001,7 @@ NSString *const MVIRCChatConnectionZNCPluginPlaybackFeature = @"MVIRCChatConnect
 
 	_isonSentCount = 0;
 
-	dispatch_async(dispatch_get_main_queue(), ^{
+	CQQueueAsync(CQQueueMain(), ^{
 		[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector( _periodicEvents ) object:nil];
 //		[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector( _whoisWatchedUsers ) object:nil];
 		[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector( _checkWatchedUsers ) object:nil];
@@ -1013,7 +1016,7 @@ NSString *const MVIRCChatConnectionZNCPluginPlaybackFeature = @"MVIRCChatConnect
 	}
 
 	@synchronized( _knownUsers ) {
-		for (MVChatUser *user in [_knownUsers objectEnumerator]) {
+		for (MVChatUser *user in NSAllMapTableValues(_knownUsers)) {
 			[user _setStatus:MVChatUserUnknownStatus];
 		}
 	}
@@ -1071,9 +1074,17 @@ NSString *const MVIRCChatConnectionZNCPluginPlaybackFeature = @"MVIRCChatConnect
 		self.connectedSecurely = YES;
 
 		[self _startTLS];
-    } else {
+	} else {
         self.connectedSecurely = NO;
     }
+
+	// GNUstep: _queueWait is only cleared on disconnect, so messages queued before
+	// the socket connected (e.g. bookmark auto-join) wait the full JVQueueWaitBeforeConnected
+	// (120s). Clear it now that we are connected so they flush immediately.
+	MVSafeAdoptAssign( _queueWait, nil );
+	CQQueueAsync(CQQueueMain(), ^{
+		[self _resetSendQueueInterval];
+	});
 
 	NSString *password = _password;
 	NSString *username = ( _username.length ? _username : @"anonymous" );
@@ -1114,7 +1125,7 @@ NSString *const MVIRCChatConnectionZNCPluginPlaybackFeature = @"MVIRCChatConnect
 	[self sendRawMessageImmediatelyWithFormat:@"NICK %@", [self preferredNickname]];
 	[self sendRawMessageImmediatelyWithFormat:@"USER %@ 0 * :%@", username, ( _realName.length ? _realName : @"Anonymous User" )];
 
-	dispatch_async(dispatch_get_main_queue(), ^{
+	CQQueueAsync(CQQueueMain(), ^{
 		[self performSelector:@selector(_periodicEvents) withObject:nil afterDelay:JVPeriodicEventsInterval];
 	});
 
@@ -1136,7 +1147,7 @@ NSString *const MVIRCChatConnectionZNCPluginPlaybackFeature = @"MVIRCChatConnect
 - (void) processIncomingMessage:(id) raw fromServer:(BOOL) fromServer {
 	NSParameterAssert([raw isKindOfClass:[NSData class]]);
 
-	dispatch_async(_connectionQueue, ^{
+	CQQueueAsync(_connectionQueue, ^{
 		[self _processIncomingMessage:raw fromServer:fromServer];
 	});
 }
@@ -1287,7 +1298,7 @@ parsingFinished: { // make a scope for this
 	}
 }
 
-- (void)_processedCommand:(NSString *) commandString fromSender:(id __nullable) chatSender withIntentOrTags:(NSMutableDictionary *) intentOrTagsDictionary parameters:(NSMutableArray *) parameters {
+- (void)_processedCommand:(NSString *) commandString fromSender:(id _Nullable) chatSender withIntentOrTags:(NSMutableDictionary *) intentOrTagsDictionary parameters:(NSMutableArray *) parameters {
 	BOOL hasTagsToSend = !!intentOrTagsDictionary.allKeys.count;
 	NSString *selectorString = nil;
 	SEL selector = NULL;
@@ -1426,7 +1437,7 @@ parsingFinished: { // make a scope for this
 
 	static NSCharacterSet *backspaceCharacterSet = nil;
 	static dispatch_once_t onceToken;
-	dispatch_once(&onceToken, ^{
+	CQQueueOnce(&onceToken, ^{
 		backspaceCharacterSet = [[NSCharacterSet characterSetWithRange:NSMakeRange(8, 1)] copy]; // 08 in ASCII is backspace, that OS X sometimes inserts if you shift + arrow and then delete text
 	});
 	[message cq_stringByRemovingCharactersInSet:backspaceCharacterSet];
@@ -1454,7 +1465,7 @@ parsingFinished: { // make a scope for this
 		MVChatRoom *room = ([target isKindOfClass:[MVChatRoom class]] ? target : nil);
 		NSNumber *action = ([attributes[@"action"] boolValue] ? attributes[@"action"] : @(NO));
 		NSMutableDictionary *privmsgInfo = [NSMutableDictionary dictionaryWithObjectsAndKeys:msg, @"message", [self localUser], @"user", [NSString locallyUniqueString], @"identifier", action, @"action", target, @"target", room, @"room", nil];
-		dispatch_async(_connectionQueue, ^{ @autoreleasepool {
+		CQQueueAsync(_connectionQueue, ^{ @autoreleasepool {
 			[self performSelector:@selector(_handlePrivmsg:) withObject:privmsgInfo];
 		}});
 	}
@@ -1521,7 +1532,7 @@ parsingFinished: { // make a scope for this
 	} else return NO;
 }
 
-- (void) _sendCommand:(NSString *) command withArguments:(nullable MVChatString *) arguments withEncoding:(NSStringEncoding) encoding toTarget:(id __nullable) target {
+- (void) _sendCommand:(NSString *) command withArguments:(nullable MVChatString *) arguments withEncoding:(NSStringEncoding) encoding toTarget:(id _Nullable) target {
 	MVAssertMainThreadRequired();
 
 	BOOL isRoom = [target isKindOfClass:[MVChatRoom class]];
@@ -1942,10 +1953,10 @@ parsingFinished: { // make a scope for this
 
 - (void) _handleConnect {
 	MVSafeRetainAssign( _queueWait, [NSDate dateWithTimeIntervalSinceNow:0.5] );
-	dispatch_async(dispatch_get_main_queue(), ^{
+	CQQueueAsync(CQQueueMain(), ^{
 		[self _resetSendQueueInterval];
 
-		dispatch_async(_connectionQueue, ^{
+		CQQueueAsync(_connectionQueue, ^{
 			[self _didConnect];
 		});
 	});
@@ -2050,9 +2061,9 @@ parsingFinished: { // make a scope for this
 
 	_nextPingTimeInterval = [NSDate timeIntervalSinceReferenceDate] + JVPingServerInterval ;
 	double delayInSeconds = JVPingServerInterval + 1.;
-	dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delayInSeconds * NSEC_PER_SEC));
+	dispatch_time_t popTime = CQQueueTime(DISPATCH_TIME_NOW, (int64_t)(delayInSeconds * NSEC_PER_SEC));
 	__weak __typeof__((self)) weakSelf = self;
-	dispatch_after(popTime, _connectionQueue, ^(void){
+	CQQueueAfter(popTime, _connectionQueue, ^(void){
 		__strong __typeof__((weakSelf)) strongSelf = weakSelf;
 		NSTimeInterval nowTimeInterval = [NSDate timeIntervalSinceReferenceDate];
 		if (strongSelf->_nextPingTimeInterval < nowTimeInterval) {
@@ -2102,18 +2113,17 @@ parsingFinished: { // make a scope for this
 		return;
 	}
 
-	NSData *data = nil;
+		NSData *data = nil;
 	@synchronized( _sendQueue ) {
 		data = _sendQueue[0];
 		[_sendQueue removeObjectAtIndex:0];
-
 		if( _sendQueue.count )
 			[self performSelector:@selector( _sendQueue ) withObject:nil afterDelay:MIN( [self minimumSendQueueDelay] + ( _sendQueue.count * [self sendQueueDelayIncrement] ), [self maximumSendQueueDelay] )];
 		else _sendQueueProcessing = NO;
 	}
 
 	__weak __typeof__((self)) weakSelf = self;
-	dispatch_async(_connectionQueue, ^{
+	CQQueueAsync(_connectionQueue, ^{
 		__strong __typeof__((weakSelf)) strongSelf = weakSelf;
 		MVSafeAdoptAssign( strongSelf->_lastCommand, [[NSDate alloc] init] );
 		[strongSelf _writeDataToServer:data];
@@ -2262,7 +2272,7 @@ parsingFinished: { // make a scope for this
 
 #pragma mark -
 
-- (NSString * __nullable) _newStringWithBytes:(const char *) bytes length:(NSUInteger) length NS_RETURNS_RETAINED {
+- (NSString * _Nullable) _newStringWithBytes:(const char *) bytes length:(NSUInteger) length NS_RETURNS_RETAINED {
 	if( bytes && length ) {
 		NSStringEncoding encoding = [self encoding];
 		if( encoding != NSUTF8StringEncoding && isValidUTF8( bytes, length ) )
@@ -2317,7 +2327,7 @@ parsingFinished: { // make a scope for this
 	return MVChatRoomMemberNoModes;
 }
 
-- (MVChatRoomMemberMode) _stripModePrefixesFromNickname:(NSString *__nonnull *__nonnull) nicknamePtr {
+- (MVChatRoomMemberMode) _stripModePrefixesFromNickname:(NSString *_Nonnull *_Nonnull) nicknamePtr {
 	NSString *nickname = *nicknamePtr;
 	MVChatRoomMemberMode modes = MVChatRoomMemberNoModes;
 	NSMutableDictionary *prefixes = _serverInformation[@"roomMemberPrefixTable"];
@@ -2351,7 +2361,7 @@ parsingFinished: { // make a scope for this
 
 	_sendEndCapabilityCommandAtTime = [NSDate timeIntervalSinceReferenceDate] + JVEndCapabilityTimeoutDelay;
 
-	dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(JVEndCapabilityTimeoutDelay * NSEC_PER_SEC)), _connectionQueue, ^{
+	CQQueueAfter(CQQueueTime(DISPATCH_TIME_NOW, (int64_t)(JVEndCapabilityTimeoutDelay * NSEC_PER_SEC)), _connectionQueue, ^{
 		[self _sendEndCapabilityCommandForcefully:NO];
 	});
 }
@@ -2361,7 +2371,7 @@ parsingFinished: { // make a scope for this
 
 	_sendEndCapabilityCommandAtTime = [NSDate timeIntervalSinceReferenceDate] + 1.;
 
-	dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1. * NSEC_PER_SEC)), _connectionQueue, ^{
+	CQQueueAfter(CQQueueTime(DISPATCH_TIME_NOW, (int64_t)(1. * NSEC_PER_SEC)), _connectionQueue, ^{
 		[self _sendEndCapabilityCommandForcefully:NO];
 	});
 }
@@ -2744,7 +2754,7 @@ parsingFinished: { // make a scope for this
 		[self _identifyWithServicesUsingNickname:[self preferredNickname]]; // identifying proactively -> preferred nickname
 	}
 
-	dispatch_async(dispatch_get_main_queue(), ^{
+	CQQueueAsync(CQQueueMain(), ^{
 		[self performSelector:@selector(_checkWatchedUsers) withObject:nil afterDelay:2.];
 	});
 }
@@ -2911,7 +2921,7 @@ parsingFinished: { // make a scope for this
 #pragma mark -
 #pragma mark Incoming Message Replies
 
-- (MVChatRoom*__nullable) _chatRoomFromMessageTarget:(NSString*)messageTarget
+- (MVChatRoom*_Nullable) _chatRoomFromMessageTarget:(NSString*)messageTarget
 {
 	// a room identifier consists of a chatroom prefix (for example #&+!) and the room name: #room
 	// additionally it can be pre-prefixed in PRIVMSG or NOTICE with a nickname prefix (for example @+), indicating a room message, that is only visible to room members with that user status: @#room
@@ -3724,7 +3734,7 @@ parsingFinished: { // make a scope for this
 
 }
 
-- (void) _handleCTCP:(NSMutableData *) data asRequest:(BOOL) request fromSender:(MVChatUser *) sender toTarget:(id) target forRoom:(MVChatRoom *__nullable) room withTags:(NSDictionary *) tags {
+- (void) _handleCTCP:(NSMutableData *) data asRequest:(BOOL) request fromSender:(MVChatUser *) sender toTarget:(id) target forRoom:(MVChatRoom *_Nullable) room withTags:(NSDictionary *) tags {
 	NSMutableDictionary *info = [[NSMutableDictionary alloc] initWithCapacity:4];
 
 	if( tags )[info addEntriesFromDictionary:tags];
@@ -3913,7 +3923,7 @@ parsingFinished: { // make a scope for this
 	}
 }
 
-- (void) _parseRoomModes:(NSArray *) parameters forRoom:(MVChatRoom *) room fromSender:(MVChatUser *__nullable) sender {
+- (void) _parseRoomModes:(NSArray *) parameters forRoom:(MVChatRoom *) room fromSender:(MVChatUser *_Nullable) sender {
 #define enabledHighBit ( 1 << 31 )
 #define banMode ( 1 << 30 )
 #define banExcludeMode ( 1 << 29 )

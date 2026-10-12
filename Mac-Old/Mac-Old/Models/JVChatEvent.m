@@ -33,7 +33,7 @@
 		xmlFree( prop );
 
 		prop = xmlGetProp( (xmlNode *) _node, (xmlChar *) "occurred" );
-		_date = ( prop ? [[NSString stringWithUTF8String:(char *) prop] dateFromFormat:@"yyyy-MM-DD HH:mm:ss ZZZZZ"] : nil );
+		_date = ( prop ? [[NSString stringWithUTF8String:(char *) prop] dateFromFormat:@"yyyy-MM-dd HH:mm:ss ZZZ"] : nil );
 		xmlFree( prop );
 	}
 

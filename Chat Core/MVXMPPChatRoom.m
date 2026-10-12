@@ -1,4 +1,3 @@
-@import XMPPFramework;
 
 #import "MVXMPPChatRoom.h"
 #import "MVXMPPChatUser.h"
@@ -32,7 +31,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 #pragma mark -
 
-- (NSURL *__nullable) url {
+- (NSURL *_Nullable) url {
 	NSString *urlString = [NSString stringWithFormat:@"%@:%@?join", [[self connection] urlScheme], [[_uniqueIdentifier domain] stringByEncodingIllegalURLCharacters]];
 	if( urlString ) return [NSURL URLWithString:urlString];
 	return nil;
@@ -44,7 +43,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 #pragma mark -
 
-- (void) partWithReason:(MVChatString * __nullable) reason {
+- (void) partWithReason:(MVChatString * _Nullable) reason {
 	if( ! [self isJoined] ) return;
 	[self _setDateParted:[NSDate date]];
 }
@@ -81,7 +80,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 #pragma mark -
 
-- (void) kickOutMemberUser:(MVChatUser *) user forReason:(MVChatString * __nullable) reason {
+- (void) kickOutMemberUser:(MVChatUser *) user forReason:(MVChatString * _Nullable) reason {
 	[super kickOutMemberUser:user forReason:reason];
 }
 

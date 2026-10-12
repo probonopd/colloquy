@@ -8,7 +8,7 @@ NS_ASSUME_NONNULL_BEGIN
 	static NSArray <NSString *> *validExtensions = nil;
 
 	static dispatch_once_t onceToken;
-	dispatch_once(&onceToken, ^{
+	CQQueueOnce(&onceToken, ^{
 		validExtensions = @[ @"tiff", @"tif", @"jpg", @"jpeg", @"gif", @"png", @"bmp", @"bmpf", @"ico", @"cur", @"xbm", @"svg" ];
 	});
 
@@ -20,7 +20,7 @@ NS_ASSUME_NONNULL_BEGIN
 	static NSArray <NSString *> *validExtensions = nil;
 
 	static dispatch_once_t onceToken;
-	dispatch_once(&onceToken, ^{
+	CQQueueOnce(&onceToken, ^{
 		validExtensions = @[ @"aac", @"aiff", @"aif", @"aifc", @"cdda", @"amr", @"mp3", @"swa", @"mpeg", @"mpg", @"mp3", @"m4a", @"m4b", @"m4p" ];
 	});
 
@@ -31,7 +31,7 @@ NS_ASSUME_NONNULL_BEGIN
 	static NSArray <NSString *> *validExtensions = nil;
 
 	static dispatch_once_t onceToken;
-	dispatch_once(&onceToken, ^{
+	CQQueueOnce(&onceToken, ^{
 		validExtensions = @[ @"3gp", @"3gpp", @"3g2", @"3gp2", @"mp4", @"mov", @"qt", @"mqv", @"m4v" ];
 	});
 

@@ -1,6 +1,5 @@
 #import "MVDirectChatConnection.h"
 
-@import CocoaAsyncSocket;
 
 #import "MVDirectChatConnectionPrivate.h"
 

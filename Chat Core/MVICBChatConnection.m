@@ -37,7 +37,6 @@
 #import <stdarg.h>
 #import <Foundation/Foundation.h>
 
-@import CocoaAsyncSocket;
 
 #import "MVChatConnectionPrivate.h"
 #import "MVChatRoomPrivate.h"
@@ -86,7 +85,7 @@ static BOOL hasSubstring( NSString *str, NSString *substr, NSRange *r ) {
 - (void) _writeDataToServer:(id) raw;
 - (void) _readNextMessageFromServer;
 - (void) _joinChatRoomNamed:(NSString *) name
-		 withPassphrase:(NSString * __nullable) passphrase
+		 withPassphrase:(NSString * _Nullable) passphrase
 	     alreadyJoined:(BOOL) joined;
 - (void) _updateKnownUser:(MVChatUser *) user
          withNewNickname:(NSString *) newNickname;
@@ -133,11 +132,11 @@ static BOOL hasSubstring( NSString *str, NSString *substr, NSRange *r ) {
 
 #pragma mark Accessors
 
-- (NSString *__nullable) nickname {
+- (NSString *_Nullable) nickname {
 	return _nickname;
 }
 
-- (NSString *__nullable) password {
+- (NSString *_Nullable) password {
 	return _password;
 }
 
@@ -161,16 +160,16 @@ static BOOL hasSubstring( NSString *str, NSString *substr, NSRange *r ) {
 	return @"icb";
 }
 
-- (NSString *__nullable) username {
+- (NSString *_Nullable) username {
 	return _username;
 }
 
 #pragma mark Modifiers
 
-- (void) setAwayStatusMessage:(MVChatString * __nullable) message {
+- (void) setAwayStatusMessage:(MVChatString * _Nullable) message {
 }
 
-- (void) setNickname:(NSString *__nullable) newNickname {
+- (void) setNickname:(NSString *_Nullable) newNickname {
 	NSParameterAssert( newNickname );
 	NSParameterAssert( newNickname.length > 0 );
 
@@ -183,7 +182,7 @@ static BOOL hasSubstring( NSString *str, NSString *substr, NSRange *r ) {
 	}
 }
 
-- (void) setPassword:(NSString *__nullable) newPassword {
+- (void) setPassword:(NSString *_Nullable) newPassword {
 	[_password release];
 
 	if( ! newPassword )
@@ -213,7 +212,7 @@ static BOOL hasSubstring( NSString *str, NSString *substr, NSRange *r ) {
 		                objectAtIndex:0] shortValue];
 }
 
-- (void) setUsername:(NSString *__nullable) newUsername {
+- (void) setUsername:(NSString *_Nullable) newUsername {
 	NSParameterAssert( newUsername );
 	NSParameterAssert( newUsername.length > 0 );
 
@@ -252,7 +251,7 @@ static BOOL hasSubstring( NSString *str, NSString *substr, NSRange *r ) {
 		      inThread:_connectionThread];
 }
 
-- (void) disconnectWithReason:(MVChatString * __nullable) reason {
+- (void) disconnectWithReason:(MVChatString * _Nullable) reason {
 	[self cancelPendingReconnectAttempts];
 	if( _sendQueueProcessing && _connectionThread )
 		[self performSelector:@selector( _stopSendQueue )
@@ -272,7 +271,7 @@ static BOOL hasSubstring( NSString *str, NSString *substr, NSRange *r ) {
 	}
 }
 
-- (void) sendCommand:(NSString *) command withArguments:(MVChatString * __nullable) arguments {
+- (void) sendCommand:(NSString *) command withArguments:(MVChatString * _Nullable) arguments {
 #if USE(ATTRIBUTED_CHAT_STRING)
 	NSString *argumentsString = [arguments string];
 #elif USE(PLAIN_CHAT_STRING) || USE(HTML_CHAT_STRING)
@@ -352,7 +351,7 @@ static BOOL hasSubstring( NSString *str, NSString *substr, NSRange *r ) {
 	}
 }
 
-- (void) joinChatRoomNamed:(NSString *) name withPassphrase:(NSString * __nullable) passphrase {
+- (void) joinChatRoomNamed:(NSString *) name withPassphrase:(NSString * _Nullable) passphrase {
 	if( _loggedIn )
 		[self _joinChatRoomNamed:name withPassphrase:passphrase alreadyJoined:NO];
 	else
@@ -389,7 +388,7 @@ static BOOL hasSubstring( NSString *str, NSString *substr, NSRange *r ) {
 
         NSString *bundleIdentifier = [[NSBundle mainBundle] bundleIdentifier];
         NSString *queueName = [NSString stringWithFormat:@"%@.connection-queue (%@)", bundleIdentifier, [self description]];
-        _connectionDelegateQueue = dispatch_queue_create([queueName UTF8String], DISPATCH_QUEUE_SERIAL);
+        _connectionDelegateQueue = CQQueueCreate([queueName UTF8String], DISPATCH_QUEUE_SERIAL);
         _connectionThread = [NSThread currentThread];
         if( [_connectionThread respondsToSelector:@selector( setName: )] )
             [_connectionThread setName:[self description]];
@@ -417,7 +416,7 @@ static BOOL hasSubstring( NSString *str, NSString *substr, NSRange *r ) {
 
         if( [NSThread currentThread] == _connectionThread ) {
             _connectionThread = nil;
-            dispatch_release(_connectionDelegateQueue);
+            CQQueueRelease(_connectionDelegateQueue);
         }
     }
 }
@@ -563,7 +562,7 @@ static BOOL hasSubstring( NSString *str, NSString *substr, NSRange *r ) {
 #pragma mark Rooms handling
 
 - (void) _joinChatRoomNamed:(NSString *) name
-		 withPassphrase:(NSString * __nullable) passphrase
+		 withPassphrase:(NSString * _Nullable) passphrase
 		 alreadyJoined:(BOOL) joined {
 	if( [name compare:[_room name] options:NSCaseInsensitiveSearch] != 0 ) {
 		if( ! joined ) {

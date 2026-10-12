@@ -64,7 +64,7 @@
 	[self.autoOpenPorts setState:( autoOpen ? NSOnState: NSOffState )];
 
 	NSString *path = [MVFileTransferController userPreferredDownloadFolder];
-	NSMenuItem *menuItem = [self.saveDownloads itemAtIndex:[self.saveDownloads indexOfItemWithTag:2]];
+	NSMenuItem *menuItem = (NSMenuItem *)[self.saveDownloads itemAtIndex:[self.saveDownloads indexOfItemWithTag:2]];
 	NSImage *icon = [[NSWorkspace sharedWorkspace] iconForFile:path];
 	[icon setSize:NSMakeSize( 16., 16. )];
 
@@ -111,7 +111,7 @@
 
 - (void) saveDownloadsOpenPanelDidEnd:(NSOpenPanel *) sheet returnCode:(NSInteger) returnCode contextInfo:(void *) contextInfo {
 	if( returnCode == NSModalResponseOK ) {
-		NSMenuItem *menuItem = [self.saveDownloads itemAtIndex:[self.saveDownloads indexOfItemWithTag:2]];
+		NSMenuItem *menuItem = (NSMenuItem *)[self.saveDownloads itemAtIndex:[self.saveDownloads indexOfItemWithTag:2]];
 		NSImage *icon = [[NSWorkspace sharedWorkspace] iconForFile:[[sheet directoryURL] path]];
 		[icon setSize:NSMakeSize( 16., 16. )];
 

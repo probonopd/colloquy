@@ -1,104 +1,96 @@
 #import "CQKeychain.h"
 
-#import <Security/Security.h>
-
 NS_ASSUME_NONNULL_BEGIN
 
-@implementation CQKeychain
+// GNUstep has no secure keychain service. The upstream CQKeychain was stubbed to
+// a no-op, and MVKeyChain relies on macOS SecKeychain APIs that do not exist on
+// GNUstep, so passwords (server and SASL) could never be persisted or read back.
+// We implement CQKeychain with a plaintext property-list store under the user's
+// Library/Preferences directory. This is the documented GNUstep fallback: it is
+// not encrypted, but it is the only viable option without a platform keychain.
+@implementation CQKeychain {
+	NSMutableDictionary *_passwords;
+	NSMutableDictionary *_data;
+	NSString *_path;
+}
+
 + (CQKeychain *) standardKeychain {
 	static CQKeychain *sharedInstance;
 	if (!sharedInstance) sharedInstance = [[self alloc] init];
 	return sharedInstance;
 }
 
-static NSMutableDictionary *createBaseDictionary(NSString *server, NSString *__nullable account) {
-	NSCParameterAssert(server);
-
-	NSMutableDictionary *query = [[NSMutableDictionary alloc] init];
-
-	query[(__bridge id)kSecClass] = (__bridge id)kSecClassInternetPassword;
-	query[(__bridge id)kSecAttrServer] = server;
-	if (account) query[(__bridge id)kSecAttrAccount] = account;
-
-	return query;
-}
-
-- (void) setPassword:(NSString *) password forServer:(NSString *) server area:(NSString *__nullable) area {
-	[self setPassword:password forServer:server area:area displayValue:nil];
-}
-
-- (void) setPassword:(NSString *) password forServer:(NSString *) server area:(NSString *__nullable) area displayValue:(NSString *__nullable)displayValue {
-	if (!password.length) {
-		[self removePasswordForServer:server area:area];
-		return;
+- (instancetype) init {
+	if ((self = [super init])) {
+		NSString *dir = [NSHomeDirectory() stringByAppendingPathComponent: @"Library/Preferences"];
+		_path = [dir stringByAppendingPathComponent: @"ColloquyKeychain.plist"];
+		_passwords = [NSMutableDictionary dictionary];
+		_data = [NSMutableDictionary dictionary];
+		[self _load];
 	}
-
-	NSData *passwordData = [password dataUsingEncoding:NSUTF8StringEncoding];
-
-	[self setData:passwordData forServer:server area:area displayValue:displayValue];
+	return self;
 }
 
-- (void) setData:(NSData *) passwordData forServer:(NSString *) server area:(NSString *__nullable) area {
-	[self setData:passwordData forServer:server area:area displayValue:nil];
+- (NSString *) _keyForServer: (NSString *) server area: (NSString *) area {
+	return [NSString stringWithFormat: @"%@\n%@", (server ?: @""), (area ?: @"")];
 }
 
-- (void) setData:(NSData *) passwordData forServer:(NSString *) server area:(NSString *__nullable) area displayValue:(NSString *__nullable)displayValue {
-	NSParameterAssert(server);
-
-	if (!passwordData.length) {
-		[self removeDataForServer:server area:area];
-		return;
-	}
-
-	NSMutableDictionary *passwordEntry = createBaseDictionary(server, area);
-
-	passwordEntry[(__bridge id)kSecValueData] = passwordData;
-	if (displayValue) passwordEntry[(__bridge id)kSecAttrLabel] = displayValue;
-
-	OSStatus status = SecItemAdd((__bridge CFDictionaryRef)passwordEntry, NULL);
-	if (status == errSecDuplicateItem) {
-		[passwordEntry removeObjectForKey:(__bridge id)kSecValueData];
-
-		NSMutableDictionary *attributesToUpdate = [[NSMutableDictionary alloc] initWithObjectsAndKeys:passwordData, (__bridge id)kSecValueData, nil];
-
-		SecItemUpdate((__bridge CFDictionaryRef)passwordEntry, (__bridge CFDictionaryRef)attributesToUpdate);
+- (void) _load {
+	NSFileManager *fm = [NSFileManager defaultManager];
+	if ([fm fileExistsAtPath: _path]) {
+		NSDictionary *dict = [NSDictionary dictionaryWithContentsOfFile: _path];
+		if (dict) {
+			id pw = [dict objectForKey: @"passwords"];
+			id dt = [dict objectForKey: @"data"];
+			_passwords = ([pw isKindOfClass: [NSDictionary class]] ? [pw mutableCopy] : [NSMutableDictionary dictionary]);
+			_data = ([dt isKindOfClass: [NSDictionary class]] ? [dt mutableCopy] : [NSMutableDictionary dictionary]);
+		}
 	}
 }
 
-- (NSString *__nullable) passwordForServer:(NSString *) server area:(NSString *__nullable) area {
-	NSData *data = [self dataForServer:server area:area];
-	if (!data) {
-		return nil;
-	}
-
-	return [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
+- (void) _save {
+	NSFileManager *fm = [NSFileManager defaultManager];
+	NSString *dir = [_path stringByDeletingLastPathComponent];
+	if (![fm fileExistsAtPath: dir])
+		[fm createDirectoryAtPath: dir withIntermediateDirectories: YES attributes: nil error: NULL];
+	NSDictionary *dict = @{ @"passwords": _passwords, @"data": _data };
+	[dict writeToFile: _path atomically: YES];
 }
 
-- (NSData *__nullable) dataForServer:(NSString *) server area:(NSString *__nullable) area {
-	NSParameterAssert(server);
-
-	NSMutableDictionary *passwordQuery = createBaseDictionary(server, area);
-
-	passwordQuery[(__bridge id)kSecReturnData] = (__bridge id)kCFBooleanTrue;
-	passwordQuery[(__bridge id)kSecMatchLimit] = (__bridge id)kSecMatchLimitOne;
-
-	CFTypeRef resultDataRef;
-	OSStatus status = SecItemCopyMatching((__bridge CFDictionaryRef)passwordQuery, &resultDataRef);
-	if (status == noErr && resultDataRef)
-		return (__bridge NSData *)CFAutorelease(resultDataRef);
-
-	return nil;
+- (void) setPassword: (NSString *) password forServer: (NSString *) server area: (NSString *) area {
+	[_passwords setObject: (password ?: @"") forKey: [self _keyForServer: server area: area]];
+	[self _save];
 }
 
-- (void) removePasswordForServer:(NSString *) server area:(NSString *__nullable) area {
-	[self removeDataForServer:server area:area];
+- (void) setPassword: (NSString *) password forServer: (NSString *) server area: (NSString *) area displayValue: (NSString *__nullable) displayValue {
+	[self setPassword: password forServer: server area: area];
 }
 
-- (void) removeDataForServer:(NSString *) server area:(NSString *__nullable) area {
-	NSParameterAssert(server);
+- (NSString *__nullable) passwordForServer: (NSString *) server area: (NSString *) area {
+	return [_passwords objectForKey: [self _keyForServer: server area: area]];
+}
 
-	NSMutableDictionary *passwordQuery = createBaseDictionary(server, area);
-	SecItemDelete((__bridge CFDictionaryRef)passwordQuery);
+- (void) removePasswordForServer: (NSString *) server area: (NSString *) area {
+	[_passwords removeObjectForKey: [self _keyForServer: server area: area]];
+	[self _save];
+}
+
+- (void) setData: (NSData *) passwordData forServer: (NSString *) server area: (NSString *) area {
+	[_data setObject: (passwordData ?: [NSData data]) forKey: [self _keyForServer: server area: area]];
+	[self _save];
+}
+
+- (void) setData: (NSData *) passwordData forServer: (NSString *) server area: (NSString *) area displayValue: (NSString *__nullable) displayValue {
+	[self setData: passwordData forServer: server area: area];
+}
+
+- (NSData *__nullable) dataForServer: (NSString *) server area: (NSString *) area {
+	return [_data objectForKey: [self _keyForServer: server area: area]];
+}
+
+- (void) removeDataForServer: (NSString *) server area: (NSString *) area {
+	[_data removeObjectForKey: [self _keyForServer: server area: area]];
+	[self _save];
 }
 @end
 

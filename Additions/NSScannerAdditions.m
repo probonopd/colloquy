@@ -6,7 +6,7 @@
 NS_ASSUME_NONNULL_BEGIN
 
 @implementation NSScanner (NSScannerAdditions)
-- (BOOL) scanCharactersFromSet:(NSCharacterSet *) scanSet maxLength:(NSUInteger) maxLength intoString:(NSString *__nullable * __nullable) stringValue {
+- (BOOL) scanCharactersFromSet:(NSCharacterSet *) scanSet maxLength:(NSUInteger) maxLength intoString:(NSString *_Nullable * _Nullable) stringValue {
 	if( ! [self isAtEnd] ) {
 		NSUInteger location = [self scanLocation];
 		NSString *source = [self string];

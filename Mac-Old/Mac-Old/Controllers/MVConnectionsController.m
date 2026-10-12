@@ -286,6 +286,16 @@ static NSMenu *favoritesMenu = nil;
 	[showDetails setButtonType:NSOnOffButton];
 
 	[self setWindowFrameAutosaveName:@"Connections"];
+
+	// The nib restores the saved frame before the toolbar exists, and the
+	// toolbar's height is then added on top, while saving subtracts it again:
+	// the window loses that difference on every launch until it is nothing
+	// but a title bar.  Keep it usable and restore the frame once more, now
+	// that the toolbar is in place.
+	[[self window] setContentMinSize:NSMakeSize( 350., 160. )];
+	[[self window] setFrameUsingName:@"Connections"];
+
+
 	[self _validateToolbar];
 
 	NSNumberFormatter *numberFormatter = [[NSNumberFormatter alloc] init];

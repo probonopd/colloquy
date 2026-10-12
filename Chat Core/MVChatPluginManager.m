@@ -1,4 +1,6 @@
 #import "MVChatPluginManager.h"
+
+#import <objc/runtime.h>
 #import "NSFileManagerAdditions.h"
 #import "NSMethodSignatureAdditions.h"
 #import "NSNotificationAdditions.h"
@@ -51,7 +53,9 @@ NSString *MVChatPluginManagerDidFindInvalidPluginsNotification = @"MVChatPluginM
 	_invalidPlugins = [[NSMutableDictionary alloc] init];
 	[self reloadPlugins];
 
-	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector( applicationWillTerminate: ) name:NSApplicationWillTerminateNotification object:[NSApplication sharedApplication]];
+	// The chat core builds without AppKit, so the notification is observed by
+	// name from whichever object posts it.
+	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector( applicationWillTerminate: ) name:@"NSApplicationWillTerminateNotification" object:nil];
 
 	return self;
 }
@@ -105,10 +109,39 @@ NSString *MVChatPluginManagerDidFindInvalidPluginsNotification = @"MVChatPluginM
 		}
 	}
 
+	[self _loadLinkedInPlugins];
+
 	if (invalidPluginList.count) [[NSNotificationCenter chatCenter] postNotificationName:MVChatPluginManagerDidFindInvalidPluginsNotification object:invalidPluginList];
 	[[NSNotificationCenter chatCenter] postNotificationName:MVChatPluginManagerDidReloadPluginsNotification object:self];
 
 	_reloadingPlugins = NO;
+}
+
+// Plug-ins that are linked into the application instead of being loaded from
+// a bundle (the standard chat commands, for instance) are not found by the
+// search above, so pick them up from the runtime.
+- (void) _loadLinkedInPlugins {
+	unsigned int count = 0;
+	Class *classes = objc_copyClassList( &count );
+	if( ! classes ) return;
+
+	for( unsigned int i = 0; i < count; i++ ) {
+		Class candidate = classes[i];
+		if( ! class_conformsToProtocol( candidate, @protocol( MVChatPlugin ) ) )
+			continue;
+		if( ! [candidate instancesRespondToSelector:@selector( initWithManager: )] )
+			continue;
+
+		BOOL loaded = NO;
+		for( id plugin in _plugins )
+			if( [plugin isMemberOfClass:candidate] ) { loaded = YES; break; }
+		if( loaded ) continue;
+
+		id plugin = [[candidate alloc] initWithManager:self];
+		if( plugin ) [self addPlugin:plugin];
+	}
+
+	free( classes );
 }
 
 - (void) addPlugin:(NSBundle *) plugin {
@@ -145,7 +178,7 @@ NSString *MVChatPluginManagerDidFindInvalidPluginsNotification = @"MVChatPluginM
 	return [self pluginsOfClass:NULL thatRespondToSelector:selector];
 }
 
-- (NSArray *) pluginsOfClass:(Class __nullable) class thatRespondToSelector:(SEL) selector {
+- (NSArray *) pluginsOfClass:(Class _Nullable) class thatRespondToSelector:(SEL) selector {
 	NSParameterAssert( selector != NULL );
 
 	NSMutableArray *qualified = [[NSMutableArray alloc] init];
@@ -167,7 +200,7 @@ NSString *MVChatPluginManagerDidFindInvalidPluginsNotification = @"MVChatPluginM
 	return [self makePluginsOfClass:NULL performInvocation:invocation stoppingOnFirstSuccessfulReturn:stop];
 }
 
-- (NSArray *) makePluginsOfClass:(Class __nullable) class performInvocation:(NSInvocation *) invocation stoppingOnFirstSuccessfulReturn:(BOOL) stop {
+- (NSArray *) makePluginsOfClass:(Class _Nullable) class performInvocation:(NSInvocation *) invocation stoppingOnFirstSuccessfulReturn:(BOOL) stop {
 	NSParameterAssert( invocation != nil );
 	NSParameterAssert( [invocation selector] != NULL );
 

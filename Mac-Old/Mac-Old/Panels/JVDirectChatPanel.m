@@ -1801,8 +1801,12 @@ NSString *JVChatEventMessageWasProcessedNotification = @"JVChatEventMessageWasPr
 		// in some versions of WebKit (v125.9 at least), this is a font name, not a font family, try both
 		NSString *fontFamily = [preferences standardFontFamily];
 		NSInteger fontSize = [preferences defaultFontSize];
-		baseFont = [NSFont fontWithName:fontFamily size:fontSize];
-		if( ! baseFont ) baseFont = [[NSFontManager sharedFontManager] fontWithFamily:fontFamily traits:( NSUnboldFontMask | NSUnitalicFontMask ) weight:5 size:fontSize];
+		// Ask for the family's regular face first: passing a family name to
+		// +fontWithName: can answer whichever face the family lists first,
+		// which is how the input field ended up bold (and sending every
+		// message as bold text).
+		baseFont = [[NSFontManager sharedFontManager] fontWithFamily:fontFamily traits:( NSUnboldFontMask | NSUnitalicFontMask ) weight:5 size:fontSize];
+		if( ! baseFont ) baseFont = [NSFont fontWithName:fontFamily size:fontSize];
 	}
 
 	[send setBaseFont:baseFont];

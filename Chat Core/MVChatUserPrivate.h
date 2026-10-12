@@ -10,10 +10,10 @@ NS_ASSUME_NONNULL_BEGIN
 - (void) _setType:(MVChatUserType) type;
 - (void) _setUniqueIdentifier:(id) identifier;
 - (void) _setNickname:(NSString *) name;
-- (void) _setRealName:(NSString * __nullable) name;
-- (void) _setUsername:(NSString * __nullable) name;
-- (void) _setAccount:(NSString * __nullable) account;
-- (void) _setAddress:(NSString * __nullable) address;
+- (void) _setRealName:(NSString * _Nullable) name;
+- (void) _setUsername:(NSString * _Nullable) name;
+- (void) _setAccount:(NSString * _Nullable) account;
+- (void) _setAddress:(NSString * _Nullable) address;
 - (void) _setServerAddress:(NSString *) address;
 - (void) _setPublicKey:(NSData *) key;
 - (void) _setFingerprint:(NSString *) fingerprint;
@@ -21,10 +21,10 @@ NS_ASSUME_NONNULL_BEGIN
 - (void) _setIdentified:(BOOL) identified;
 - (void) _setIdleTime:(NSTimeInterval) time;
 - (void) _setStatus:(MVChatUserStatus) status;
-- (void) _setDateConnected:(NSDate * __nullable) date;
-- (void) _setDateDisconnected:(NSDate * __nullable) date;
+- (void) _setDateConnected:(NSDate * _Nullable) date;
+- (void) _setDateDisconnected:(NSDate * _Nullable) date;
 - (void) _setDateUpdated:(NSDate *) date;
-- (void) _setAwayStatusMessage:(NSData * __nullable) awayStatusMessage;
+- (void) _setAwayStatusMessage:(NSData * _Nullable) awayStatusMessage;
 - (BOOL) _onlineNotificationSent;
 - (void) _setOnlineNotificationSent:(BOOL) sent;
 @end

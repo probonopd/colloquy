@@ -46,7 +46,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 #pragma mark -
 
-- (void) partWithReason:(MVChatString * __nullable) reason {
+- (void) partWithReason:(MVChatString * _Nullable) reason {
 	if( ! [self isJoined] ) return;
 
 	MVChatConnection *connection = [self connection];
@@ -124,7 +124,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 #pragma mark -
 
-- (void) setMode:(MVChatRoomMode) mode withAttribute:(id __nullable) attribute {
+- (void) setMode:(MVChatRoomMode) mode withAttribute:(id _Nullable) attribute {
 	[super setMode:mode withAttribute:attribute];
 
 	MVChatConnection *connection = [self connection];
@@ -295,7 +295,7 @@ NS_ASSUME_NONNULL_BEGIN
 	return [NSSet set];
 }
 
-- (MVChatUser *__nullable) memberUserWithUniqueIdentifier:(id) identifier {
+- (MVChatUser *_Nullable) memberUserWithUniqueIdentifier:(id) identifier {
 	if( ! [identifier isKindOfClass:[NSString class]] ) return nil;
 
 	NSString *uniqueIdentfier = [identifier lowercaseString];
@@ -311,7 +311,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 #pragma mark -
 
-- (void) kickOutMemberUser:(MVChatUser *) user forReason:(MVChatString * __nullable) reason {
+- (void) kickOutMemberUser:(MVChatUser *) user forReason:(MVChatString * _Nullable) reason {
 	[super kickOutMemberUser:user forReason:reason];
 
 	MVChatConnection *connection = [self connection];

@@ -1,8 +1,12 @@
 #import <Foundation/Foundation.h>
+#ifdef GNUSTEP
+#import "CQCompatibility.h"
+#else
 #import <SystemConfiguration/SCNetworkReachability.h>
+#endif
 
-#import <ChatCore/MVAvailability.h>
-#import <ChatCore/MVChatString.h>
+#import "MVAvailability.h"
+#import "MVChatString.h"
 
 
 NS_ASSUME_NONNULL_BEGIN
@@ -209,7 +213,7 @@ COLLOQUY_EXPORT
 	unsigned short _nextAltNickIndex;
 	NSUInteger _hash;
 }
-+ (BOOL) supportsURLScheme:(NSString *__nullable) scheme;
++ (BOOL) supportsURLScheme:(NSString *_Nullable) scheme;
 + (NSArray <NSNumber *> *) defaultServerPortsForType:(MVChatConnectionType) type;
 + (NSUInteger) maxMessageLengthForType:(MVChatConnectionType) type;
 
@@ -323,7 +327,7 @@ COLLOQUY_EXPORT
 - (void) connect;
 - (void) connectToServer:(NSString *) server onPort:(unsigned short) port asUser:(NSString *) nickname;
 - (void) disconnect;
-- (void) disconnectWithReason:(MVChatString * __nullable) reason;
+- (void) disconnectWithReason:(MVChatString * _Nullable) reason;
 - (void) forceDisconnect;
 
 #pragma mark -
@@ -333,7 +337,7 @@ COLLOQUY_EXPORT
 
 #pragma mark -
 
-- (void) sendCommand:(NSString *) command withArguments:(MVChatString * __nullable) arguments;
+- (void) sendCommand:(NSString *) command withArguments:(MVChatString * _Nullable) arguments;
 
 #pragma mark -
 
@@ -353,7 +357,7 @@ COLLOQUY_EXPORT
 
 - (void) joinChatRoomsNamed:(NSArray <NSString *> *) rooms;
 - (void) joinChatRoomNamed:(NSString *) room;
-- (void) joinChatRoomNamed:(NSString *) room withPassphrase:(NSString * __nullable) passphrase;
+- (void) joinChatRoomNamed:(NSString *) room withPassphrase:(NSString * _Nullable) passphrase;
 
 #pragma mark -
 

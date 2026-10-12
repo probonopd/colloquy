@@ -42,7 +42,7 @@ NSString *MVChatUserWatchRuleRemovedMatchedUserNotification = @"MVChatUserWatchR
 	return self;
 }
 
-- (id) copyWithZone:(NSZone * __nullable) zone {
+- (id) copyWithZone:(NSZone * _Nullable) zone {
 	MVChatUserWatchRule *copy = [[MVChatUserWatchRule alloc] init];
 
 	MVSafeCopyAssign( copy->_username, _username );
@@ -181,11 +181,11 @@ NSString *MVChatUserWatchRuleRemovedMatchedUserNotification = @"MVChatUserWatchR
 	}
 }
 
-- (NSString *__nullable) nickname {
+- (NSString *_Nullable) nickname {
 	return (_nicknameIsRegex && _nickname ? [NSString stringWithFormat:@"/%@/", _nickname] : _nickname);
 }
 
-- (void) setNickname:(NSString *__nullable) newNickname {
+- (void) setNickname:(NSString *_Nullable) newNickname {
 	_nicknameIsRegex = ( newNickname.length > 2 && [newNickname hasPrefix:@"/"] && [newNickname hasSuffix:@"/"] );
 
 	if( _nicknameIsRegex )
@@ -198,11 +198,11 @@ NSString *MVChatUserWatchRuleRemovedMatchedUserNotification = @"MVChatUserWatchR
 	return _nicknameIsRegex;
 }
 
-- (NSString *__nullable) realName {
+- (NSString *_Nullable) realName {
 	return (_realNameIsRegex && _realName ? [NSString stringWithFormat:@"/%@/", _realName] : _realName);
 }
 
-- (void) setRealName:(NSString *__nullable) newRealName {
+- (void) setRealName:(NSString *_Nullable) newRealName {
 	_realNameIsRegex = ( newRealName.length > 2 && [newRealName hasPrefix:@"/"] && [newRealName hasSuffix:@"/"] );
 
 	if( _realNameIsRegex )
@@ -215,11 +215,11 @@ NSString *MVChatUserWatchRuleRemovedMatchedUserNotification = @"MVChatUserWatchR
 	return _realNameIsRegex;
 }
 
-- (NSString *__nullable) username {
+- (NSString *_Nullable) username {
 	return (_usernameIsRegex && _username ? [NSString stringWithFormat:@"/%@/", _username] : _username);
 }
 
-- (void) setUsername:(NSString *__nullable) newUsername {
+- (void) setUsername:(NSString *_Nullable) newUsername {
 	_usernameIsRegex = ( newUsername.length > 2 && [newUsername hasPrefix:@"/"] && [newUsername hasSuffix:@"/"] );
 
 	if( _usernameIsRegex )
@@ -232,11 +232,11 @@ NSString *MVChatUserWatchRuleRemovedMatchedUserNotification = @"MVChatUserWatchR
 	return _usernameIsRegex;
 }
 
-- (NSString *__nullable) address {
+- (NSString *_Nullable) address {
 	return (_addressIsRegex && _address ? [NSString stringWithFormat:@"/%@/", _address] : _address);
 }
 
-- (void) setAddress:(NSString *__nullable) newAddress {
+- (void) setAddress:(NSString *_Nullable) newAddress {
 	_addressIsRegex = ( newAddress.length > 2 && [newAddress hasPrefix:@"/"] && [newAddress hasSuffix:@"/"] );
 
 	if( _addressIsRegex )

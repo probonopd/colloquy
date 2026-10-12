@@ -31,10 +31,10 @@
 - (id) initWithCoder:(NSCoder *) coder {
 	if( [coder allowsKeyedCoding] ) {
 		self = [self init];
-		[self setKind:[coder decodeIntForKey:@"kind"]];
+		[self setKind:[coder decodeIntegerForKey:@"kind"]];
 		[self setQuery:[coder decodeObjectForKey:@"query"]];
-		[self setOperation:[coder decodeIntForKey:@"operation"]];
-		[self setQueryUnits:[coder decodeIntForKey:@"queryUnits"]];
+		[self setOperation:[coder decodeIntegerForKey:@"operation"]];
+		[self setQueryUnits:[coder decodeIntegerForKey:@"queryUnits"]];
 		[self setUsesSmartTranscriptCriterion:[coder decodeBoolForKey:@"smartTranscriptCriterion"]];
 		return self;
 	}
@@ -51,9 +51,7 @@
 		[coder encodeInteger:[self operation] forKey:@"operation"];
 		[coder encodeInteger:[self queryUnits] forKey:@"queryUnits"];
 		[coder encodeBool:[self usesSmartTranscriptCriterion] forKey:@"smartTranscriptCriterion"];
-	}
-
-	[NSException raise:NSInvalidArchiveOperationException format:@"Only supports NSKeyedArchiver coders"];
+	} else [NSException raise:NSInvalidArchiveOperationException format:@"Only supports NSKeyedArchiver coders"];
 }
 
 - (id) copyWithZone:(NSZone *) zone {
@@ -226,7 +224,7 @@
 	} else if( [self format] == JVTranscriptDateCriterionFormat ) {
 		[self setQuery:[NSNumber numberWithDouble:[dateQuery doubleValue]]];
 	} else if( [self format] == JVTranscriptListCriterionFormat ) {
-		NSMenuItem *mitem = [listQuery selectedItem];
+		NSMenuItem *mitem = (NSMenuItem *)[listQuery selectedItem];
 		if( [mitem representedObject] ) [self setQuery:[mitem representedObject]];
 		else [self setQuery:[NSNumber numberWithLong:[mitem tag]]];
 	}

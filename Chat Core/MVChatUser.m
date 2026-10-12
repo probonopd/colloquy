@@ -76,7 +76,7 @@ NSString *MVChatUserAttributeUpdatedNotification = @"MVChatUserAttributeUpdatedN
 	return [self wildcardUserWithNicknameMask:mask andHostMask:nil];
 }
 
-+ (instancetype) wildcardUserWithNicknameMask:(NSString * __nullable) nickname andHostMask:(NSString * __nullable) host {
++ (instancetype) wildcardUserWithNicknameMask:(NSString * _Nullable) nickname andHostMask:(NSString * _Nullable) host {
 	MVChatUser *ret = [[self alloc] init];
 	ret -> _type = MVChatWildcardUserType;
 
@@ -280,7 +280,7 @@ NSString *MVChatUserAttributeUpdatedNotification = @"MVChatUserAttributeUpdatedN
 	return _serverAddress;
 }
 
-- (NSString *__nullable) maskRepresentation {
+- (NSString *_Nullable) maskRepresentation {
 	return nil;
 }
 
@@ -335,7 +335,7 @@ NSString *MVChatUserAttributeUpdatedNotification = @"MVChatUserAttributeUpdatedN
 	}
 }
 
-- (void) setAttribute:(id __nullable) attribute forKey:(id) key {
+- (void) setAttribute:(id _Nullable) attribute forKey:(id) key {
 	NSParameterAssert( key != nil );
 	@synchronized( _attributes ) {
 		if( attribute ) _attributes[key] = attribute;
@@ -372,11 +372,11 @@ NSString *MVChatUserAttributeUpdatedNotification = @"MVChatUserAttributeUpdatedN
 
 #pragma mark -
 
-- (void) sendSubcodeRequest:(NSString *) command withArguments:(id __nullable) arguments {
+- (void) sendSubcodeRequest:(NSString *) command withArguments:(id _Nullable) arguments {
 // subclass this method, if needed
 }
 
-- (void) sendSubcodeReply:(NSString *) command withArguments:(id __nullable) arguments {
+- (void) sendSubcodeReply:(NSString *) command withArguments:(id _Nullable) arguments {
 // subclass this method, if needed
 }
 
@@ -406,20 +406,20 @@ NSString *MVChatUserAttributeUpdatedNotification = @"MVChatUserAttributeUpdatedN
 	MVSafeCopyAssign( _nickname, name );
 }
 
-- (void) _setRealName:(NSString * __nullable) name {
+- (void) _setRealName:(NSString * _Nullable) name {
 	MVSafeCopyAssign( _realName, name );
 }
 
-- (void) _setUsername:(NSString * __nullable) name {
+- (void) _setUsername:(NSString * _Nullable) name {
 	MVSafeCopyAssign( _username, name );
 }
 
-- (void) _setAccount:(NSString * __nullable) account {
+- (void) _setAccount:(NSString * _Nullable) account {
 	if (_type != MVChatLocalUserType)
 		MVSafeCopyAssign( _account, account );
 }
 
-- (void) _setAddress:(NSString * __nullable) newAddress {
+- (void) _setAddress:(NSString * _Nullable) newAddress {
 	MVSafeCopyAssign( _address, newAddress );
 }
 
@@ -454,7 +454,7 @@ NSString *MVChatUserAttributeUpdatedNotification = @"MVChatUserAttributeUpdatedN
 	[[NSNotificationCenter chatCenter] postNotificationOnMainThreadWithName:MVChatUserStatusChangedNotification object:self];
 }
 
-- (void) _setDateConnected:(NSDate * __nullable) date {
+- (void) _setDateConnected:(NSDate * _Nullable) date {
 	MVSafeCopyAssign( _dateConnected, date );
 }
 
@@ -466,7 +466,7 @@ NSString *MVChatUserAttributeUpdatedNotification = @"MVChatUserAttributeUpdatedN
 	MVSafeCopyAssign( _dateUpdated, date );
 }
 
-- (void) _setAwayStatusMessage:(NSData * __nullable) newAwayStatusMessage {
+- (void) _setAwayStatusMessage:(NSData * _Nullable) newAwayStatusMessage {
 	MVSafeCopyAssign( _awayStatusMessage, newAwayStatusMessage );
 }
 

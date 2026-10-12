@@ -52,7 +52,12 @@ static NSString *JVToolbarRuleSettingsItemIdentifier = @"JVToolbarRuleSettingsIt
 		[settings setObject:[coder decodeObjectForKey:@"rules"] forKey:@"rules"];
 		[settings setObject:[coder decodeObjectForKey:@"title"] forKey:@"title"];
 		[settings setObject:@([coder decodeBoolForKey:@"ignoreCase"]) forKey:@"ignoreCase"];
-		[settings setObject:@([coder decodeIntForKey:@"operation"]) forKey:@"operation"];
+		// Older archives stored the operation as a number object; newer ones
+		// store it as an integer.  A mismatch here aborts the decode and with
+		// it every smart transcript the user saved.
+		id operation = [coder decodeObjectForKey:@"operation"];
+		if( ! operation ) operation = @([coder decodeIntegerForKey:@"operation"]);
+		[settings setObject:operation forKey:@"operation"];
 		return [self initWithSettings:settings];
 	} else [NSException raise:NSInvalidArchiveOperationException format:@"Only supports NSKeyedArchiver coders"];
 	return nil;

@@ -4,7 +4,7 @@
 	@protected
 	/* xmlNode */ void *_node;
 	NSScriptObjectSpecifier *_objectSpecifier;
-	__weak JVChatTranscript *_transcript;
+	JVChatTranscript *_transcript;
 	NSDate *_startDate;
 }
 - (/* xmlNode */ void *) node;

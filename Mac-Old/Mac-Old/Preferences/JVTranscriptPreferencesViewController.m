@@ -54,7 +54,7 @@
 	if( ! [[NSFileManager defaultManager] fileExistsAtPath:path] )
 		[[NSFileManager defaultManager] createDirectoryAtPath:path withIntermediateDirectories:YES attributes:nil error:nil];
 
-	NSMenuItem *menuItem = [self.transcriptFolder itemAtIndex:[self.transcriptFolder indexOfItemWithTag:2]];
+	NSMenuItem *menuItem = (NSMenuItem *)[self.transcriptFolder itemAtIndex:[self.transcriptFolder indexOfItemWithTag:2]];
 	NSImage *icon = [[NSWorkspace sharedWorkspace] iconForFile:path];
 	[icon setSize:NSMakeSize( 16., 16. )];
 
@@ -85,7 +85,7 @@
 
 - (void) saveDownloadsOpenPanelDidEnd:(NSOpenPanel *) sheet returnCode:(NSInteger) returnCode contextInfo:(void *) contextInfo {
 	if( returnCode == NSModalResponseOK ) {
-		NSMenuItem *menuItem = [self.transcriptFolder itemAtIndex:[self.transcriptFolder indexOfItemWithTag:2]];
+		NSMenuItem *menuItem = (NSMenuItem *)[self.transcriptFolder itemAtIndex:[self.transcriptFolder indexOfItemWithTag:2]];
 		NSImage *icon = [[NSWorkspace sharedWorkspace] iconForFile:[[sheet directoryURL] path]];
 		[icon setSize:NSMakeSize( 16., 16. )];
 

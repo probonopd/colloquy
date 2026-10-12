@@ -56,7 +56,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 #pragma mark Generic room handling
 
-- (void) partWithReason:(MVChatString * __nullable) reason {
+- (void) partWithReason:(MVChatString * _Nullable) reason {
 }
 
 - (void) changeTopic:(MVChatString *) newTopic {

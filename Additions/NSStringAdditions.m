@@ -541,7 +541,7 @@ static NSString *colorForHTML( unsigned char red, unsigned char green, unsigned 
 	if( ! knownEmoticons ) {
 		knownEmoticons = [[NSMutableArray alloc] initWithCapacity:350];
 		for (const struct EmojiEmoticonPair *entry = emoticonToEmojiList; entry && entry->emoticon; ++entry)
-			[knownEmoticons addObject:(__bridge id)entry->emoticon];
+			[knownEmoticons addObject:(id)entry->emoticon];
 	}
 
 	return knownEmoticons;
@@ -935,7 +935,7 @@ static NSString *colorForHTML( unsigned char red, unsigned char green, unsigned 
 	[copy enumerateSubstringsInRange:NSMakeRange(0, copy.length) options:NSStringEnumerationBySentences usingBlock:^(NSString *sentence, NSRange sentenceRange, NSRange enclosingRange, BOOL *stop) {
 		const NSLinguisticTaggerOptions options = NSLinguisticTaggerOmitPunctuation | NSLinguisticTaggerOmitWhitespace | NSLinguisticTaggerOmitOther | NSLinguisticTaggerJoinNames;
 		[copy enumerateLinguisticTagsInRange:sentenceRange scheme:NSLinguisticTagSchemeTokenType options:options orthography:nil usingBlock:^(NSString *tag, NSRange tokenRange, NSRange tokenSentenceRange, BOOL *innerStop) {
-			[copy replaceCharactersInRange:tokenRange withString:[[copy substringWithRange:tokenRange] capitalizedStringWithLocale:[NSLocale currentLocale]]];
+			[copy replaceCharactersInRange:tokenRange withString:[[copy substringWithRange:tokenRange] capitalizedString]];
 			*innerStop = YES;
 		}];
 	}];
@@ -997,16 +997,16 @@ static NSString *colorForHTML( unsigned char red, unsigned char green, unsigned 
 
 #pragma mark -
 
-- (NSString *__nullable) stringByEncodingIllegalURLCharacters {
+- (NSString *_Nullable) stringByEncodingIllegalURLCharacters {
 	static NSCharacterSet *illegalURLCharacters = nil;
 	static dispatch_once_t onceToken;
-	dispatch_once(&onceToken, ^{
+	CQQueueOnce(&onceToken, ^{
 		illegalURLCharacters = [NSCharacterSet characterSetWithCharactersInString:@",;:/?@&$=|^~`\{}[]"];
 	});
 	return [self stringByAddingPercentEncodingWithAllowedCharacters:illegalURLCharacters];
 }
 
-- (NSString *__nullable) stringByDecodingIllegalURLCharacters {
+- (NSString *_Nullable) stringByDecodingIllegalURLCharacters {
 	return [self stringByRemovingPercentEncoding];
 }
 
@@ -1060,7 +1060,7 @@ static NSString *colorForHTML( unsigned char red, unsigned char green, unsigned 
 
 #pragma mark -
 
-- (NSArray <NSString *> * __nullable) _IRCComponents {
+- (NSArray <NSString *> * _Nullable) _IRCComponents {
 	NSArray <NSString *> *components = [self componentsSeparatedByCharactersInSet:[NSCharacterSet characterSetWithCharactersInString:@"!@ "]];
 
 	// given "nickname!username@hostmask realname", we want to get "nickname", "username", "hostmask" and "realname" back
@@ -1074,19 +1074,19 @@ static NSString *colorForHTML( unsigned char red, unsigned char green, unsigned 
 	return self.IRCNickname.length;
 }
 
-- (NSString *__nullable) IRCNickname {
+- (NSString *_Nullable) IRCNickname {
 	return self._IRCComponents[0];
 }
 
-- (NSString *__nullable) IRCUsername {
+- (NSString *_Nullable) IRCUsername {
 	return self._IRCComponents[1];
 }
 
-- (NSString *__nullable) IRCHostname {
+- (NSString *_Nullable) IRCHostname {
 	return self._IRCComponents[2];
 }
 
-- (NSString *__nullable) IRCRealname {
+- (NSString *_Nullable) IRCRealname {
 	NSArray <NSString *> *components = self._IRCComponents;
 	if (components.count == 4)
 		return components[3];
@@ -1167,11 +1167,11 @@ static NSCharacterSet *typicalEmoticonCharacters;
 	return [regularExpression numberOfMatchesInString:self options:NSMatchingReportCompletion range:NSMakeRange(0, self.length)];
 }
 
-- (NSString *__nullable) stringByMatching:(NSString *) regex capture:(NSInteger) capture {
+- (NSString *_Nullable) stringByMatching:(NSString *) regex capture:(NSInteger) capture {
 	return [self stringByMatching:regex options:0 inRange:NSMakeRange(0, self.length) capture:capture error:nil];
 }
 
-- (NSString *__nullable) stringByMatching:(NSString *) regex options:(NSRegularExpressionOptions) options inRange:(NSRange) range capture:(NSInteger) capture error:(NSError **) error {
+- (NSString *_Nullable) stringByMatching:(NSString *) regex options:(NSRegularExpressionOptions) options inRange:(NSRange) range capture:(NSInteger) capture error:(NSError **) error {
 	NSRegularExpression *regularExpression = [NSRegularExpression cachedRegularExpressionWithPattern:regex options:options error:error];
 	NSTextCheckingResult *result = [regularExpression firstMatchInString:self options:NSMatchingReportCompletion range:range];
 
@@ -1365,7 +1365,7 @@ static NSCharacterSet *typicalEmoticonCharacters;
 		escapedCharacters = [NSCharacterSet characterSetWithCharactersInString:@"^[]{}()\\.$*+?|"];
 
 	for (const struct EmojiEmoticonPair *entry = emoticonToEmojiList; entry && entry->emoticon; ++entry) {
-		NSString *searchEmoticon = (__bridge id)entry->emoticon;
+		NSString *searchEmoticon = (id)entry->emoticon;
 		if (encoded) searchEmoticon = [searchEmoticon stringByEncodingXMLSpecialCharactersAsEntities];
 		if ([self rangeOfString:searchEmoticon options:NSLiteralSearch range:*range].location == NSNotFound)
 			continue;
@@ -1409,7 +1409,7 @@ static NSCharacterSet *typicalEmoticonCharacters;
 		unichar currentCharacter = [self characterAtIndex:emojiRange.location];
 		for (const struct EmojiEmoticonPair *entry = emojiToEmoticonList; entry && entry->emoji; ++entry) {
 			if (entry->emoji == currentCharacter) {
-				NSString *emoticon = (__bridge id)entry->emoticon;
+				NSString *emoticon = (id)entry->emoticon;
 				if (encode) emoticon = [emoticon stringByEncodingXMLSpecialCharactersAsEntities];
 
 				NSString *replacement = nil;

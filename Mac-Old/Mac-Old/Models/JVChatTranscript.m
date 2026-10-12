@@ -820,7 +820,7 @@ NSString *JVChatTranscriptUpdatedNotification = @"JVChatTranscriptUpdatedNotific
 	xmlChar *prop = xmlGetProp( node, (xmlChar *) "began" );
 	if( prop ) {
 		NSString *dateString = [NSString stringWithUTF8String:(char *) prop];
-		NSDate *date = [dateString dateFromFormat:@"yyyy-MM-DD HH:mm:ss ZZZZZ"];
+		NSDate *date = [dateString dateFromFormat:@"yyyy-MM-dd HH:mm:ss ZZZ"];
 		const NSCalendarUnit requestedComponents = (NSCalendarUnitYear | NSCalendarUnitMonth | NSCalendarUnitDay | NSCalendarUnitHour | NSCalendarUnitMinute | NSCalendarUnitSecond | NSCalendarUnitTimeZone);
 		NSDateComponents *ret = [[NSCalendar autoupdatingCurrentCalendar] components:requestedComponents fromDate:date];
 		xmlFree( prop );
@@ -1240,7 +1240,7 @@ NSString *JVChatTranscriptUpdatedNotification = @"JVChatTranscriptUpdatedNotific
 		@synchronized( _transcript ) {
 
 			xmlChar *startedStr = xmlGetProp( (xmlNode *) _node, (xmlChar *) "started" );
-			_startDate = ( startedStr ? [[NSString stringWithUTF8String:(char *) startedStr] dateFromFormat:@"yyyy-MM-DD HH:mm:ss ZZZZZ"] : nil );
+			_startDate = ( startedStr ? [[NSString stringWithUTF8String:(char *) startedStr] dateFromFormat:@"yyyy-MM-dd HH:mm:ss ZZZ"] : nil );
 			xmlFree( startedStr );
 		}
 	}
@@ -1276,7 +1276,7 @@ NSString *JVChatTranscriptUpdatedNotification = @"JVChatTranscriptUpdatedNotific
 
 	@synchronized( _transcript ) {
 		xmlChar *prop = xmlGetProp( _node, (xmlChar *) "received" );
-		_date = ( prop ? [[NSString stringWithUTF8String:(char *) prop] dateFromFormat:@"yyyy-MM-DD HH:mm:ss ZZZZZ"] : nil );
+		_date = ( prop ? [[NSString stringWithUTF8String:(char *) prop] dateFromFormat:@"yyyy-MM-dd HH:mm:ss ZZZ"] : nil );
 		xmlFree( prop );
 
 		prop = xmlGetProp( _node, (xmlChar *) "action" );

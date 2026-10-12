@@ -288,10 +288,10 @@ static BOOL applicationIsTerminating = NO;
 }
 
 - (IBAction) joinRoom:(id) sender {
-	if( ! [[[MVConnectionsController defaultController] connections] count] )
+	NSArray *connections = [[MVConnectionsController defaultController] connections];
+	if( ! [connections count] )
 		return;
-	NSArray *connections = [[MVConnectionsController defaultController] connectedConnections];
-	MVChatConnection *connection = ( [connections count] ? [connections objectAtIndex:0] : nil );
+	MVChatConnection *connection = [connections objectAtIndex:0];
 	[[JVChatRoomBrowser chatRoomBrowserForConnection:connection] showWindow:nil];
 }
 
@@ -312,9 +312,12 @@ static BOOL applicationIsTerminating = NO;
 	if( [[NSFileManager defaultManager] isReadableFileAtPath:filename] && ( [[filename pathExtension] caseInsensitiveCompare:@"colloquyTranscript"] == NSOrderedSame || ( [[attributes objectForKey:NSFileHFSTypeCode] unsignedIntValue] == 'coTr' && [[attributes objectForKey:NSFileHFSCreatorCode] unsignedIntValue] == 'coRC' ) ) ) {
 		NSString *searchString = nil;
 
-		NSAppleEventManager *sam = [NSAppleEventManager sharedAppleEventManager];
-		NSAppleEventDescriptor *lastEvent = [sam currentAppleEvent];
-		searchString = [[lastEvent descriptorForKeyword:keyAESearchText] stringValue];
+		// GNUstep has no Apple event support; search text is not available.
+		if ([NSAppleEventManager respondsToSelector:@selector( sharedAppleEventManager )]) {
+			NSAppleEventManager *sam = [NSAppleEventManager sharedAppleEventManager];
+			NSAppleEventDescriptor *lastEvent = [sam currentAppleEvent];
+			searchString = [[lastEvent descriptorForKeyword:keyAESearchText] stringValue];
+		}
 
 		JVChatTranscriptPanel *transcript = [[JVChatController defaultController] chatViewControllerForTranscript:filename];
 		if( searchString ) [transcript setSearchQuery:searchString];
@@ -485,7 +488,9 @@ static BOOL applicationIsTerminating = NO;
 		[[NSUserDefaults standardUserDefaults] setInteger:[[NSUserDefaults standardUserDefaults] integerForKey:@"JVRemoveTransferedItems"] forKey:@"JVRemoveTransferredItems"];
 		[[NSUserDefaults standardUserDefaults] removeObjectForKey:@"JVRemoveTransferedItems"];
 	}
-	[[NSAppleEventManager sharedAppleEventManager] setEventHandler:self andSelector:@selector( handleURLEvent:withReplyEvent: ) forEventClass:kInternetEventClass andEventID:kAEGetURL];
+	// GNUstep has no Apple event support; URL events are not registered.
+	if ([NSAppleEventManager respondsToSelector:@selector( sharedAppleEventManager )])
+		[[NSAppleEventManager sharedAppleEventManager] setEventHandler:self andSelector:@selector( handleURLEvent:withReplyEvent: ) forEventClass:kInternetEventClass andEventID:kAEGetURL];
 
 	if ([[NSUserDefaults standardUserDefaults] boolForKey:@"MVAskOnInvalidCertificates"] || [[[CQKeychain standardKeychain] passwordForServer:@"MVAskOnInvalidCertificates" area:@"MVSecurePrefs"] boolValue])
 		[[CQKeychain standardKeychain] setPassword:@"1" forServer:@"MVAskOnInvalidCertificates" area:@"MVSecurePrefs"];
@@ -567,13 +572,21 @@ static BOOL applicationIsTerminating = NO;
 - (void) applicationWillTerminate:(NSNotification *) notification {
 	applicationIsTerminating = YES;
 
-	[[NSAppleEventManager sharedAppleEventManager] removeEventHandlerForEventClass:kInternetEventClass andEventID:kAEGetURL];
+	// GNUstep has no Apple event support; URL event handler was never registered.
+	if ([NSAppleEventManager respondsToSelector:@selector( sharedAppleEventManager )])
+		[[NSAppleEventManager sharedAppleEventManager] removeEventHandlerForEventClass:kInternetEventClass andEventID:kAEGetURL];
 
 	[[NSUserDefaults standardUserDefaults] synchronize];
 	[[NSURLCache sharedURLCache] removeAllCachedResponses];
 
 	NSTimeInterval runTime = ABS([_launchDate timeIntervalSinceNow]);
 	[[JVAnalyticsController defaultController] setObject:[NSNumber numberWithDouble:runTime] forKey:@"run-time"];
+}
+
+// Colloquy is a background IRC client: closing the last window must not quit
+// the app (GNUstep/Eau would otherwise terminate by default).
+- (BOOL) applicationShouldTerminateAfterLastWindowClosed:(NSApplication *) sender {
+	return NO;
 }
 
 - (NSApplicationTerminateReply) applicationShouldTerminate:(NSApplication *) sender {
@@ -733,4 +746,24 @@ static BOOL applicationIsTerminating = NO;
 		[[JVAnalyticsController defaultController] setObject:information forKey:@"quit-message"];
 	}
 }
+@end
+
+/* gormtool's xib->nib conversion emits window/panel template objects that, on
+   decode, receive a spurious -setTarget:/-setAction: (windows have none).  Accept
+   them harmlessly so the nib loads; real control targets use NSControl. */
+@interface NSWindow (ColloquyNibHack)
+- (void) setTarget:(id) target;
+- (void) setAction:(SEL) action;
+@end
+@implementation NSWindow (ColloquyNibHack)
+- (void) setTarget:(id) target { }
+- (void) setAction:(SEL) action { }
+@end
+@interface NSView (ColloquyNibHack)
+- (void) setTarget:(id) target;
+- (void) setAction:(SEL) action;
+@end
+@implementation NSView (ColloquyNibHack)
+- (void) setTarget:(id) target { }
+- (void) setAction:(SEL) action { }
 @end

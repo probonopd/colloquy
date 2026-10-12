@@ -75,6 +75,9 @@ NSString *JVColorWellCellColorDidChangeNotification = @"JVColorWellCellColorDidC
 
 - (id) copyWithZone:(NSZone *) zone {
 	JVColorWellCell *ret = [super copyWithZone:zone];
+#ifdef GNUSTEP
+	GSForgetCopiedIvar( (void *)&ret -> _color );
+#endif
 	ret -> _color = [_color copyWithZone:zone];
 	ret -> _showsWebValue = _showsWebValue;
 	ret -> _releasing = NO;

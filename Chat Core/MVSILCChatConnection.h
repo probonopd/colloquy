@@ -1,6 +1,7 @@
 #import "MVChatConnection.h"
 #import "MVChatConnectionPrivate.h"
 
+#if defined(ENABLE_SILC) && ENABLE_SILC
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wstrict-prototypes"
 #include <libsilc/silcincludes.h>
@@ -9,6 +10,10 @@
 
 #define SilcLock(client) silc_mutex_lock(silc_schedule_get_callback_lock((client)->schedule))
 #define SilcUnlock(client) silc_mutex_unlock(silc_schedule_get_callback_lock((client)->schedule))
+#else
+#define SilcLock(client) do {} while (0)
+#define SilcUnlock(client) do {} while (0)
+#endif
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -50,7 +55,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (SilcClientParams *) _silcClientParams;
 
 - (SilcClientConnection) _silcConn;
-- (void) _setSilcConn:(SilcClientConnection __nullable) aSilcConn;
+- (void) _setSilcConn:(SilcClientConnection _Nullable) aSilcConn;
 
 - (void) _stopSilcRunloop;
 
@@ -62,7 +67,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSMutableDictionary *) _sentCommands;
 
 - (NSData *) _detachInfo;
-- (void) _setDetachInfo:(NSData * __nullable) info;
+- (void) _setDetachInfo:(NSData * _Nullable) info;
 
 - (void) _addCommand:(NSString *) raw forNumber:(SilcUInt16) cmd_ident;
 - (NSString *) _getCommandForNumber:(SilcUInt16) cmd_ident;

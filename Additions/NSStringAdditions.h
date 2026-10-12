@@ -75,8 +75,8 @@ COLLOQUY_EXPORT BOOL isValidUTF8( const char *string, NSUInteger length );
 
 - (NSUInteger) countOfStringsByMatching:(NSString *) regex;
 
-- (NSString *__nullable) stringByMatching:(NSString *) regex capture:(NSInteger) capture;
-- (NSString *__nullable) stringByMatching:(NSString *) regex options:(NSRegularExpressionOptions) options inRange:(NSRange) range capture:(NSInteger) capture error:(NSError **) error;
+- (NSString *_Nullable) stringByMatching:(NSString *) regex capture:(NSInteger) capture;
+- (NSString *_Nullable) stringByMatching:(NSString *) regex options:(NSRegularExpressionOptions) options inRange:(NSRange) range capture:(NSInteger) capture error:(NSError **) error;
 
 - (NSArray <NSString *> *) captureComponentsMatchedByRegex:(NSString *) regex options:(NSRegularExpressionOptions) options range:(NSRange) range error:(NSError **) error;
 

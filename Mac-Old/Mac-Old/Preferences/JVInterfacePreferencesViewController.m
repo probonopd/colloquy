@@ -173,8 +173,10 @@ static NSString *JVInterfacePreferencesWindowDragPboardType = @"JVInterfacePrefe
 		[info setObject:[NSMutableArray array] forKey:@"rules"];
 	}
 
-	[self.windowSetsTable selectRowIndexes:[NSIndexSet indexSetWithIndex:0] byExtendingSelection:NO];
+	// Reload first: GNUstep's table only knows the rows it has loaded and
+	// rejects selecting one it has not seen yet.
 	[self.windowSetsTable reloadData];
+	[self.windowSetsTable selectRowIndexes:[NSIndexSet indexSetWithIndex:0] byExtendingSelection:NO];
 }
 
 

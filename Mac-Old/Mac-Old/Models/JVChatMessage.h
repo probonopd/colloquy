@@ -12,7 +12,7 @@ typedef NS_ENUM(OSType, JVChatMessageType) {
 	/* xmlDoc */ void *_doc;
 	NSString *_messageIdentifier;
 	NSScriptObjectSpecifier *_objectSpecifier;
-	__weak JVChatTranscript *_transcript;
+	JVChatTranscript *_transcript;
 
 	id _senderIdentifier;
 	NSString *_senderName;
