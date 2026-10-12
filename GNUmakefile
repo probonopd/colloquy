@@ -231,18 +231,29 @@ XIBS = $(wildcard Mac-Old/Mac-Old/Interfaces/*.xib) \
 .PHONY: nibs
 nibs:
 	python3 $(CURDIR)/gnustep/xib2nib.py $(XIBS)
+	@cksum $(XIBS) > gnustep/nib-stamps
 
 before-all::
-	@stale=$$(for x in $(XIBS); do \
-		n="$${x%.xib}.nib/keyedobjects.nib"; \
-		if [ ! -f "$$n" ] || [ "$$x" -nt "$$n" ]; then echo "$$x"; fi; \
+	@missing=$$(for x in $(XIBS); do \
+		[ -f "$${x%.xib}.nib/keyedobjects.nib" ] || echo "$$x"; \
 	done); \
-	if [ -n "$$stale" ]; then \
-		echo "These nibs are missing or older than their xib; regenerate them with"; \
+	if [ -n "$$missing" ]; then \
+		echo "These nibs are missing; regenerate them with"; \
 		echo "  make nibs"; \
-		echo "$$stale"; \
+		echo "$$missing"; \
 		exit 1; \
 	fi
+	# A checkout gives every file the same timestamp, so the nibs are compared
+	# with the checksums the conversion recorded rather than with mtimes.
+	@cksum $(XIBS) > gnustep/nib-stamps.now; \
+	if ! cmp -s gnustep/nib-stamps gnustep/nib-stamps.now; then \
+		echo "These xibs changed after their nib was generated; regenerate with"; \
+		echo "  make nibs"; \
+		diff gnustep/nib-stamps gnustep/nib-stamps.now | grep '^>' | awk '{print $$4}'; \
+		rm -f gnustep/nib-stamps.now; \
+		exit 1; \
+	fi; \
+	rm -f gnustep/nib-stamps.now
 	@stale=$$(find Mac-Old/Mac-Old/Resources/Mac-Old.xcassets "Mac-Old/Mac-Old/Resources/Misc Images" gnustep/Images \
 			\( -name '*.pdf' -o -name '*.png' -o -name '*.eps' \) -newer gnustep-app/Images); \
 	if [ -n "$$stale" ]; then \

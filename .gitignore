@@ -28,3 +28,4 @@ IDEWorkspaceChecks.plist
 # GNUstep build output
 obj/
 /Colloquy.app/
+gnustep/nib-stamps.now
