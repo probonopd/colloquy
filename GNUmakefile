@@ -228,6 +228,21 @@ XIBS = $(wildcard Mac-Old/Mac-Old/Interfaces/*.xib) \
        $(wildcard Mac-Old/Mac-Old/Interfaces/Languages/*/*.xib) \
        $(wildcard Mac-Old/Mac-Old/Preferences/Base.lproj/*.xib)
 
+# The images the application looks up by name are rendered from the asset
+# catalogue, the loose PDFs and gnustep/Images; like the nibs they are
+# committed, and their sources are fingerprinted so a checkout builds.
+# One of the directories has a space in its name, so the list is built and
+# checksummed by the shell rather than passed through make.
+IMAGE_STAMP_CMD = find Mac-Old/Mac-Old/Resources/Mac-Old.xcassets \
+	"Mac-Old/Mac-Old/Resources/Misc Images" gnustep/Images \
+	\( -name '*.pdf' -o -name '*.png' -o -name '*.eps' \) | sort | \
+	while read f; do cksum "$$f"; done
+
+.PHONY: images
+images:
+	python3 $(CURDIR)/gnustep/images.py
+	@$(IMAGE_STAMP_CMD) > gnustep/image-stamps
+
 .PHONY: nibs
 nibs:
 	python3 $(CURDIR)/gnustep/xib2nib.py $(XIBS)
@@ -254,13 +269,15 @@ before-all::
 		exit 1; \
 	fi; \
 	rm -f gnustep/nib-stamps.now
-	@stale=$$(find Mac-Old/Mac-Old/Resources/Mac-Old.xcassets "Mac-Old/Mac-Old/Resources/Misc Images" gnustep/Images \
-			\( -name '*.pdf' -o -name '*.png' -o -name '*.eps' \) -newer gnustep-app/Images); \
-	if [ -n "$$stale" ]; then \
-		echo "These images changed after gnustep-app/Images was generated; run gnustep/images.py:"; \
-		echo "$$stale"; \
+	@$(IMAGE_STAMP_CMD) > gnustep/image-stamps.now; \
+	if ! cmp -s gnustep/image-stamps gnustep/image-stamps.now; then \
+		echo "These images changed after gnustep-app/Images was generated; regenerate with"; \
+		echo "  make images"; \
+		diff gnustep/image-stamps gnustep/image-stamps.now | grep '^>' | awk '{print $$4}'; \
+		rm -f gnustep/image-stamps.now; \
 		exit 1; \
-	fi
+	fi; \
+	rm -f gnustep/image-stamps.now
 
 after-all::
 	# The bundle mirrors the Colloquy (Application) target: shared resources at
