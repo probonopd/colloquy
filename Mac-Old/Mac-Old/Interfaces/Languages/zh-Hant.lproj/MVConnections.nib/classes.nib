@@ -1,0 +1,18 @@
+{
+    IBClasses = (
+	{
+	    ACTIONS = {
+		performClose = id;
+	    };
+	    CLASS = NSPanel;
+	    LANGUAGE = ObjC;
+	    SUPERCLASS = NSWindow;
+	},
+	{
+	    CLASS = FirstResponder;
+	    LANGUAGE = ObjC;
+	    SUPERCLASS = NSObject;
+	}
+    );
+    IBVersion = 1;
+}

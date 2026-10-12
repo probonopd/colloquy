@@ -1,0 +1,80 @@
+{
+    IBClasses = (
+	{
+	    ACTIONS = {
+		bugReportWebsite = id;
+		checkForUpdate = id;
+		connectToSupportRoom = id;
+		emailDeveloper = id;
+		helpWebsite = id;
+		markAllDisplays = id;
+		productWebsite = id;
+		showBuddyList = id;
+		showConnectionManager = id;
+		showPreferences = id;
+		showTransferManager = id;
+		terminateWithoutConfirm = id;
+	    };
+	    CLASS = MVApplicationController;
+	    LANGUAGE = ObjC;
+	    SUPERCLASS = NSObject;
+	},
+	{
+	    ACTIONS = {
+		hide = id;
+		hideOtherApplications = id;
+		orderFrontStandardAboutPanel = id;
+		terminate = id;
+		unhideAllApplications = id;
+	    };
+	    CLASS = NSApplication;
+	    LANGUAGE = ObjC;
+	    SUPERCLASS = NSResponder;
+	},
+	{
+	    ACTIONS = {
+		bold = id;
+		bugReportWebsite = id;
+		checkForUpdate = id;
+		clear = id;
+		clearDisplay = id;
+		closeCurrentPanel = id;
+		connectToSupportRoom = id;
+		copySelectionToFindPboard = id;
+		detachCurrentPanel = id;
+		emailDeveloper = id;
+		findNext = id;
+		findPrevious = id;
+		getInfo = id;
+		helpWebsite = id;
+		italic = id;
+		joinRoom = id;
+		jumpToMark = id;
+		jumpToNextHighlight = id;
+		jumpToPreviousHighlight = id;
+		markAllDisplays = id;
+		markDisplay = id;
+		newConnection = id;
+		orderFrontFindPanel = id;
+		productWebsite = id;
+		selectNextActivePanel = id;
+		selectNextPanel = id;
+		selectPreviousActivePanel = id;
+		selectPreviousPanel = id;
+		showBuddyList = id;
+		showConnectionManager = id;
+		showInspector = id;
+		showPreferences = id;
+		showTransferManager = id;
+		terminateWithoutConfirm = id;
+		toggleSmallDrawerIcons = id;
+		toggleTabBarVisible = id;
+		toggleViewsDrawer = id;
+	    };
+	    CLASS = FirstResponder;
+	    LANGUAGE = ObjC;
+	    SUPERCLASS = NSObject;
+	}
+    );
+    IBVersion = 1;
+}

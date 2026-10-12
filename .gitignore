@@ -28,8 +28,3 @@ IDEWorkspaceChecks.plist
 # GNUstep build output
 obj/
 /Colloquy.app/
-
-# Nibs generated from the xibs by gnustep/xib2nib.py ("make nibs")
-/Mac-Old/Mac-Old/Interfaces/*.nib/
-/Mac-Old/Mac-Old/Interfaces/Languages/*/*.nib/
-/Mac-Old/Mac-Old/Preferences/Base.lproj/*.nib/

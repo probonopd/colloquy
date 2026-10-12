@@ -220,11 +220,10 @@ include $(GNUSTEP_MAKEFILES)/application.make
 # in a makefile becomes make's default goal, so defining them earlier would
 # make a bare "make" run only that rule instead of building the app.
 
-# The nibs are generated from the xibs, not kept in the repository, so a fresh
-# checkout generates the ones it is missing before the application is packaged.
-# Only those that are missing or older than their xib are converted, which
-# keeps a second build cheap.  gnustep/xib2nib.py brings its own X server;
-# gormtool must be installed.
+# The nibs are generated from the xibs with "make nibs" and committed, because
+# generating them needs gormtool and an X server, which a machine that only
+# builds the application does not have.  A nib older than its xib no longer
+# matches the interface, so the build refuses to package it.
 XIBS = $(wildcard Mac-Old/Mac-Old/Interfaces/*.xib) \
        $(wildcard Mac-Old/Mac-Old/Interfaces/Languages/*/*.xib) \
        $(wildcard Mac-Old/Mac-Old/Preferences/Base.lproj/*.xib)
@@ -239,8 +238,10 @@ before-all::
 		if [ ! -f "$$n" ] || [ "$$x" -nt "$$n" ]; then echo "$$x"; fi; \
 	done); \
 	if [ -n "$$stale" ]; then \
-		echo "Generating nibs from $$(echo "$$stale" | wc -l) xib(s)..."; \
-		python3 $(CURDIR)/gnustep/xib2nib.py $$stale; \
+		echo "These nibs are missing or older than their xib; regenerate them with"; \
+		echo "  make nibs"; \
+		echo "$$stale"; \
+		exit 1; \
 	fi
 	@stale=$$(find Mac-Old/Mac-Old/Resources/Mac-Old.xcassets "Mac-Old/Mac-Old/Resources/Misc Images" gnustep/Images \
 			\( -name '*.pdf' -o -name '*.png' -o -name '*.eps' \) -newer gnustep-app/Images); \
