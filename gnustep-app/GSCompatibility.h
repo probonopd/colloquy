@@ -495,4 +495,13 @@ enum {
 - (void) enableAutomaticTermination:(NSString *)reason;
 @end
 
+// ---- Installing the compatibility behaviour -------------------------------
+// The method exchanges and binding registrations below must not run from
+// +load: on a platform where GNUstep establishes argv through its private
+// main() (GS_FAKE_MAIN, i.e. the BSDs), touching an AppKit class that early
+// reaches NSUserDefaults and NSProcessInfo before argv exists, and
+// NSProcessInfo then exits the process.  main() calls this instead, before
+// any nib is loaded.
+void GSCompatibilityInstall(void);
+
 #endif // GSCOMPATIBILITY_H

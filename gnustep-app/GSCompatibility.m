@@ -134,6 +134,29 @@ static NSMapTable *GSTrackingAreasForView(NSView *view, BOOL create) {
 }
 @end
 
+void GSCompatibilityInstall(void) {
+	// Nibs bind these; without them GNUstep logs "No binding exposed" and the
+	// control silently ignores the user default it is meant to follow.
+	[NSView exposeBinding:@"hidden"];
+	[NSTabView exposeBinding:@"selectedIdentifier"];
+
+	// Cocoa loads the nib named after a view controller's class when the
+	// controller was created without a nib name; see -_gs_nibName below.
+	Method original = class_getInstanceMethod([NSViewController class],
+		@selector(nibName));
+	Method replacement = class_getInstanceMethod([NSViewController class],
+		@selector(_gs_nibName));
+	method_exchangeImplementations(original, replacement);
+
+	// GNUstep only writes a tab change back to the selectedIndex binding (from
+	// -mouseDown:), so selection changes are routed through -_gs_selectTabViewItem:.
+	original = class_getInstanceMethod([NSTabView class],
+		@selector(selectTabViewItem:));
+	replacement = class_getInstanceMethod([NSTabView class],
+		@selector(_gs_selectTabViewItem:));
+	method_exchangeImplementations(original, replacement);
+}
+
 // ---- NSViewController default nib -----------------------------------------
 // Cocoa (10.10 and later) loads the nib named after the view controller's class
 // when it was created without a nib name; the preference panes rely on that and
@@ -141,12 +164,6 @@ static NSMapTable *GSTrackingAreasForView(NSView *view, BOOL create) {
 // view, so supply the class-named nib when the bundle has one.
 
 @implementation NSViewController (GSCompatibilityDefaultNib)
-+ (void) load {
-	Method original = class_getInstanceMethod(self, @selector(nibName));
-	Method replacement = class_getInstanceMethod(self, @selector(_gs_nibName));
-	method_exchangeImplementations(original, replacement);
-}
-
 - (NSString *) _gs_nibName {
 	NSString *name = [self _gs_nibName];
 	if (name)
@@ -164,23 +181,9 @@ static NSMapTable *GSTrackingAreasForView(NSView *view, BOOL create) {
 // ---- Bindings missing from GNUstep's AppKit --------------------------------
 
 @implementation NSView (GSCompatibilityBindings)
-+ (void) load {
-	// Nibs bind these; without them GNUstep logs "No binding exposed" and the
-	// control silently ignores the user default it is meant to follow.
-	[NSView exposeBinding:@"hidden"];
-	[NSTabView exposeBinding:@"selectedIdentifier"];
-}
 @end
 
 @implementation NSTabView (GSCompatibilityBindings)
-+ (void) load {
-	// GNUstep only writes a tab change back to the selectedIndex binding (from
-	// -mouseDown:), so selection changes are routed through the method below.
-	Method original = class_getInstanceMethod(self, @selector(selectTabViewItem:));
-	Method replacement = class_getInstanceMethod(self, @selector(_gs_selectTabViewItem:));
-	method_exchangeImplementations(original, replacement);
-}
-
 - (void) _gs_selectTabViewItem:(NSTabViewItem *)item {
 	[self _gs_selectTabViewItem:item];
 
